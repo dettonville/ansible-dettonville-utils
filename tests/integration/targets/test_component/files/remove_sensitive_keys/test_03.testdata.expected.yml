@@ -1,0 +1,268 @@
+__detect_hypervisor:
+  changed: true
+  cmd: 'hostnamectl | grep -i ''chassis: vm'' | wc -l'
+  delta: '0:00:00.191119'
+  end: '2024-01-17 10:33:29.689141'
+  failed: false
+  msg: ''
+  rc: 0
+  start: '2024-01-17 10:33:29.498022'
+  stderr: ''
+  stderr_lines: []
+  stdout: '1'
+  stdout_lines:
+  - '1'
+ansible_all_ipv4_addresses:
+- 172.20.0.1
+- 10.10.0.1
+- 172.31.25.37
+ansible_all_ipv6_addresses: []
+ansible_apparmor:
+  status: disabled
+ansible_architecture: x86_64
+ansible_bios_date: 11/21/2022
+ansible_bios_vendor: VMware, Inc.
+ansible_bios_version: VMW71.00V.20829224.B64.2211211837
+ansible_board_asset_tag: NA
+ansible_board_name: 440BX Desktop Reference Platform
+ansible_board_serial: NA
+ansible_board_vendor: Intel Corporation
+ansible_board_version: None
+ansible_chassis_asset_tag: No Asset Tag
+ansible_chassis_serial: NA
+ansible_chassis_vendor: No Enclosure
+ansible_chassis_version: N/A
+ansible_check_mode: false
+ansible_cmdline:
+  BOOT_IMAGE: (hd0,gpt2)/vmlinuz-4.18.0-513.9.1.el8_9.x86_64
+  audit: '1'
+  quiet: true
+  rd.lvm.lv: rhel00/swap
+  resume: /dev/mapper/rhel00-swap
+  rhgb: true
+  ro: true
+  root: /dev/mapper/rhel00-root
+ansible_config_file: /Users/ljohnson/repos/silex/dettonville/aap/dcc_common/collections/ansible_collections/dettonville/utils/tests/integration/targets/ansible.cfg
+ansible_diff_mode: false
+ansible_distribution: RedHat
+ansible_distribution_file_parsed: true
+ansible_distribution_file_path: /etc/redhat-release
+ansible_distribution_file_search_string: Red Hat
+ansible_distribution_file_variety: RedHat
+ansible_distribution_major_version: '8'
+ansible_distribution_release: Ootpa
+ansible_distribution_version: '8.9'
+ansible_domain: dettonville.org
+ansible_effective_group_id: 9018
+ansible_effective_user_id: 9018
+ansible_env:
+  ANSIBLE_GALAXY_SERVER_COMMUNITY_REPO_URL: https://ansible-galaxy.dettonville.org/api/galaxy/content/community/
+  ANSIBLE_GALAXY_SERVER_COMMUNITY_REPO_VALIDATE_CERTS: 'no'
+  ANSIBLE_GALAXY_SERVER_LIST: published_repo,rh_certified,community_repo
+  ANSIBLE_GALAXY_SERVER_PUBLISHED_REPO_URL: https://ansible-galaxy.dettonville.org/api/galaxy/content/published/
+  ANSIBLE_GALAXY_SERVER_PUBLISHED_REPO_VALIDATE_CERTS: 'no'
+  ANSIBLE_GALAXY_SERVER_RH_CERTIFIED_URL: https://ansible-galaxy.dettonville.org/api/galaxy/content/rh-certified/
+  ANSIBLE_GALAXY_SERVER_RH_CERTIFIED_VALIDATE_CERTS: 'no'
+  BASH_FUNC_which%%: "() {  ( alias;\n eval ${which_declare} ) | /usr/bin/which --tty-only
+    --read-alias --read-functions --show-tilde --show-dot $@\n}"
+  DBUS_SESSION_BUS_ADDRESS: unix:path=/run/user/9018/bus
+  HOME: /home/ansible
+  JAVA_HOME: /usr/lib/jvm/java-11-openjdk-11.0.21.0.9-2.el8.x86_64
+  LANG: en_US.UTF-8
+  LESSOPEN: '||/usr/bin/lesspipe.sh %s'
+  LOGNAME: ansible
+  LS_COLORS: 'rs=0:di=38;5;33:ln=38;5;51:mh=00:pi=40;38;5;11:so=38;5;13:do=38;5;5:bd=48;5;232;38;5;11:cd=48;5;232;38;5;3:or=48;5;232;38;5;9:mi=01;05;37;41:su=48;5;196;38;5;15:sg=48;5;11;38;5;16:ca=48;5;196;38;5;226:tw=48;5;10;38;5;16:ow=48;5;10;38;5;21:st=48;5;21;38;5;15:ex=38;5;40:*.tar=38;5;9:*.tgz=38;5;9:*.arc=38;5;9:*.arj=38;5;9:*.taz=38;5;9:*.lha=38;5;9:*.lz4=38;5;9:*.lzh=38;5;9:*.lzma=38;5;9:*.tlz=38;5;9:*.txz=38;5;9:*.tzo=38;5;9:*.t7z=38;5;9:*.zip=38;5;9:*.z=38;5;9:*.dz=38;5;9:*.gz=38;5;9:*.lrz=38;5;9:*.lz=38;5;9:*.lzo=38;5;9:*.xz=38;5;9:*.zst=38;5;9:*.tzst=38;5;9:*.bz2=38;5;9:*.bz=38;5;9:*.tbz=38;5;9:*.tbz2=38;5;9:*.tz=38;5;9:*.deb=38;5;9:*.rpm=38;5;9:*.jar=38;5;9:*.war=38;5;9:*.ear=38;5;9:*.sar=38;5;9:*.rar=38;5;9:*.alz=38;5;9:*.ace=38;5;9:*.zoo=38;5;9:*.cpio=38;5;9:*.7z=38;5;9:*.rz=38;5;9:*.cab=38;5;9:*.wim=38;5;9:*.swm=38;5;9:*.dwm=38;5;9:*.esd=38;5;9:*.jpg=38;5;13:*.jpeg=38;5;13:*.mjpg=38;5;13:*.mjpeg=38;5;13:*.gif=38;5;13:*.bmp=38;5;13:*.pbm=38;5;13:*.pgm=38;5;13:*.ppm=38;5;13:*.tga=38;5;13:*.xbm=38;5;13:*.xpm=38;5;13:*.tif=38;5;13:*.tiff=38;5;13:*.png=38;5;13:*.svg=38;5;13:*.svgz=38;5;13:*.mng=38;5;13:*.pcx=38;5;13:*.mov=38;5;13:*.mpg=38;5;13:*.mpeg=38;5;13:*.m2v=38;5;13:*.mkv=38;5;13:*.webm=38;5;13:*.ogm=38;5;13:*.mp4=38;5;13:*.m4v=38;5;13:*.mp4v=38;5;13:*.vob=38;5;13:*.qt=38;5;13:*.nuv=38;5;13:*.wmv=38;5;13:*.asf=38;5;13:*.rm=38;5;13:*.rmvb=38;5;13:*.flc=38;5;13:*.avi=38;5;13:*.fli=38;5;13:*.flv=38;5;13:*.gl=38;5;13:*.dl=38;5;13:*.xcf=38;5;13:*.xwd=38;5;13:*.yuv=38;5;13:*.cgm=38;5;13:*.emf=38;5;13:*.ogv=38;5;13:*.ogx=38;5;13:*.aac=38;5;45:*.au=38;5;45:*.flac=38;5;45:*.m4a=38;5;45:*.mid=38;5;45:*.midi=38;5;45:*.mka=38;5;45:*.mp3=38;5;45:*.mpc=38;5;45:*.ogg=38;5;45:*.ra=38;5;45:*.wav=38;5;45:*.oga=38;5;45:*.opus=38;5;45:*.spx=38;5;45:*.xspf=38;5;45:'
+  PATH: /home/ansible/.local/bin:/home/ansible/bin:/usr/local/bin:/usr/bin:/usr/local/sbin:/usr/sbin
+  PWD: /home/ansible
+  SELINUX_LEVEL_REQUESTED: ''
+  SELINUX_ROLE_REQUESTED: ''
+  SELINUX_USE_CURRENT_RANGE: ''
+  SHELL: /bin/bash
+  SHLVL: '2'
+  SSH_CLIENT: 172.21.1.76 12715 22
+  SSH_CONNECTION: 172.21.1.76 12715 172.31.25.37 22
+  SSH_TTY: /dev/pts/0
+  S_COLORS: auto
+  TERM: xterm-256color
+  TOWER_HOST: https://ansible-sandbox.dettonville.org
+  TOWER_VERIFY_SSL: 'false'
+  USER: ansible
+  XDG_RUNTIME_DIR: /run/user/9018
+  XDG_SESSION_ID: '1141'
+  _: /usr/bin/env
+  which_declare: declare -f
+ansible_fibre_channel_wwn: []
+ansible_fips: false
+ansible_forks: 5
+ansible_form_factor: Other
+ansible_fqdn: testd1s4.dettonville.org
+ansible_hostname: testd1s4
+ansible_hostnqn: ''
+ansible_inventory_sources:
+- /Users/ljohnson/repos/silex/dettonville/aap/dcc_common/collections/ansible_collections/dettonville/utils/tests/integration/targets/_test_inventory
+ansible_is_chroot: false
+ansible_iscsi_iqn: iqn.1994-05.com.redhat:8121417d7c4a
+ansible_kernel: 4.18.0-513.9.1.el8_9.x86_64
+ansible_kernel_version: '#1 SMP Thu Nov 16 10:29:04 EST 2023'
+ansible_limit: testd1s4.dettonville.org
+ansible_loadavg:
+  15m: 0.68
+  1m: 0.76
+  5m: 0.77
+ansible_local: {}
+ansible_locally_reachable_ips:
+  ipv4:
+  - 10.10.0.1
+  - 127.0.0.0/8
+  - 127.0.0.1
+  - 172.20.0.1
+  - 172.31.25.37
+  ipv6: []
+ansible_lsb: {}
+ansible_lvm: N/A
+ansible_machine: x86_64
+ansible_machine_id: f6fa177dd408409ca37a29ba250ad1ca
+ansible_memfree_mb: 693
+ansible_memory_mb:
+  nocache:
+    free: 1413
+    used: 6527
+  real:
+    free: 693
+    total: 7940
+    used: 7247
+  swap:
+    cached: 111
+    free: 2758
+    total: 4151
+    used: 1393
+ansible_memtotal_mb: 7940
+ansible_nodename: testd1s4.dettonville.org
+ansible_os_family: RedHat
+ansible_pkg_mgr: dnf
+ansible_playbook_python: /Users/ljohnson/.pyenv/versions/3.10.2/bin/python
+ansible_proc_cmdline:
+  BOOT_IMAGE: (hd0,gpt2)/vmlinuz-4.18.0-513.9.1.el8_9.x86_64
+  audit: '1'
+  quiet: true
+  rd.lvm.lv:
+  - rhel00/root
+  - rhel00/swap
+  resume: /dev/mapper/rhel00-swap
+  rhgb: true
+  ro: true
+  root: /dev/mapper/rhel00-root
+ansible_processor:
+- '0'
+- GenuineIntel
+- Intel(R) Xeon(R) Platinum 8352M CPU @ 2.30GHz
+- '1'
+- GenuineIntel
+- Intel(R) Xeon(R) Platinum 8352M CPU @ 2.30GHz
+- '2'
+- GenuineIntel
+- Intel(R) Xeon(R) Platinum 8352M CPU @ 2.30GHz
+- '3'
+- GenuineIntel
+- Intel(R) Xeon(R) Platinum 8352M CPU @ 2.30GHz
+ansible_processor_cores: 4
+ansible_processor_count: 1
+ansible_processor_nproc: 4
+ansible_processor_threads_per_core: 1
+ansible_processor_vcpus: 4
+ansible_product_name: VMware7,1
+ansible_product_serial: NA
+ansible_product_uuid: NA
+ansible_product_version: None
+ansible_python:
+  executable: /usr/local/bin/python3
+  has_sslcontext: true
+  type: cpython
+  version:
+    major: 3
+    micro: 13
+    minor: 10
+    releaselevel: final
+    serial: 0
+  version_info:
+  - 3
+  - 10
+  - 13
+  - final
+  - 0
+ansible_python_interpreter: /usr/bin/env python3
+ansible_python_version: 3.10.13
+ansible_real_group_id: 9018
+ansible_real_user_id: 9018
+ansible_run_tags:
+- display-hostvars
+ansible_selinux:
+  status: Missing selinux Python library
+ansible_selinux_python_present: false
+ansible_service_mgr: systemd
+ansible_skip_tags: []
+ansible_swapfree_mb: 2758
+ansible_swaptotal_mb: 4151
+ansible_system: Linux
+ansible_system_capabilities:
+- ''
+ansible_system_capabilities_enforced: 'True'
+ansible_system_vendor: VMware, Inc.
+ansible_uptime_seconds: 1029575
+ansible_user_dir: /home/ansible
+ansible_user_gecos: Remote Access for Ansible Tower
+ansible_user_gid: 9018
+ansible_user_id: ansible
+ansible_user_shell: /bin/bash
+ansible_user_uid: 9018
+ansible_userspace_architecture: x86_64
+ansible_userspace_bits: '64'
+ansible_verbosity: 1
+ansible_version:
+  full: 2.15.4
+  major: 2
+  minor: 15
+  revision: 4
+  string: 2.15.4
+ansible_virtualization_role: guest
+ansible_virtualization_tech_guest:
+- VMware
+ansible_virtualization_tech_host: []
+ansible_virtualization_type: VMware
+bootstrap_ntp_network_groups:
+- lnx_mem
+- lnx_dfw
+cyberark_platform_accounts__api_validate_certs: false
+cyberark_platform_accounts__machine_ip: 172.31.25.37
+cyberark_platform_accounts__os_family: linux
+cyberark_platform_accounts__pdc: pssrp1s1.dettonville.int
+cyberark_platform_accounts__platform_type: managed_domain
+gather_subset:
+- all
+group_names:
+- alasc_utils_machine_type_vm
+- alasc_utils_os_linux
+- alasc_utils_os_redhat
+- alasc_utils_os_redhat_8
+- dettonville_utils_network_dfw
+- dettonville_utils_network_dfw_dev
+- dettonville_utils_network_dfw_linux
+- dettonville_utils_network_internal
+- dettonville_utils_network_internal_linux
+- dettonville_utils_networks
+- dcc_cyberark_platform
+- dcc_cyberark_platform_lnx_managed_domain
+- nfs_network
+- nfs_network_dfw
+- ntp_network
+- ntp_network_dfw
+- ntp_network_dfw_dev
+- ntp_network_dfw_prod
+- ntp_network_dfw_qa
+- ntp_network_dfw_sandbox
+- os_linux
+- testgroup
+- testgroup_lnx
+- testgroup_lnx_sandbox
+- testgroup_lnx_site4
+- testgroup_sandbox

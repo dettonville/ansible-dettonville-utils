@@ -1,0 +1,18 @@
+- automatic_management_enabled: true
+  domain_type: local
+  safe: A-T-careconlocal
+- automatic_management_enabled: true
+  domain_type: local
+  safe: A-T-careconlocal
+- automatic_management_enabled: true
+  domain_type: local
+  groups:
+  - Administrators
+  managed: true
+  safe: Windows-Server-Local-Admin
+- automatic_management_enabled: true
+  domain_type: local
+  groups:
+  - Administrators
+  managed: true
+  safe: Windows-Server-Local-Admin

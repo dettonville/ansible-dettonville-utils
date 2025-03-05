@@ -1,0 +1,21 @@
+---
+
+test_description: "CSV test - encoded string values"
+test_file_format: "csv"
+
+## the test depends on the python dict supporting ordered keys
+## the insertion-order preservation nature of dict objects has been declared to be an official part
+##  of the Python language spec for versions 3.7+
+## ref: https://stackoverflow.com/questions/5629023/order-of-keys-in-dictionaries-in-old-versions-of-python
+test_env_requirements_sufficient: __dict_ordered_keys_supported|d(True)|bool
+
+export_list:
+  - { key1: "båz", key2: "value12", key3: "value13", key4: "value14" }
+  - { key1: "value21", key2: "ﬀöø", key3: "value23", key4: "value24" }
+  - { key1: "value31", key2: "value32", key3: "ḃâŗ", key4: "value34" }
+  - { key1: "value41", key2: "value42", key3: "ﬀöø", key4: "båz" }
+
+test_expected:
+  changed: yes
+  failed: no
+  message: "The csv file has been created successfully at .*/{{ __test_file }}"

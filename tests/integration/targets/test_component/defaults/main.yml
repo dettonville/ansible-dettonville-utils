@@ -1,0 +1,223 @@
+---
+
+__test_component__ansible_python_version: "{{ ansible_python_version.split('.')[0] }}"
+
+__test_component__vault_env: "{{ test_component__vault_env | d('TEST') }}"
+
+__test_component__test_job_url: "{{ test_component__test_job_url 
+  | d(ansible_env.AWX_HOST) 
+  | d(ansible_facts.env.AWX_HOST)
+  | d('') }}"
+
+__test_component__git_branch: "{{ test_component__git_branch | d('') }}"
+__test_component__git_branch_abbrev: "{{ (__test_component__git_branch 
+  | regex_replace('^(.*)-(\\d+)-(.*)$', '\\1-\\2') | replace('/','-')) | d('unknown') }}"
+__test_component__git_commit_hash_default: "{{ controller_project_revision 
+  | d(tower_project_revision) 
+  | d(awx_project_revision) 
+  | d('') }}"
+__test_component__git_commit_hash: "{{ test_component__git_commit_hash 
+  | d(__test_component__git_commit_hash_default) }}"
+__test_component__git_commit_hash_short: "{{ test_component__git_commit_hash_short 
+  | d(test_component__git_commit_hash[:7]) | d('') }}"
+
+__test_component__collection_default: "dettonville.utils"
+__test_component__collection: "{{ test_component__collection | d(__test_component__collection_default) }}"
+__test_component__collection_namespace: "{{ __test_component__collection.split('.')[0] }}"
+__test_component__collection_name: "{{ __test_component__collection.split('.')[1] }}"
+__test_component__collection_version: "{{ 
+  lookup('community.general.collection_version', __test_component__collection) }}"
+
+__test_component__debug_mode: "{{ test_component__debug_mode | d(True) }}"
+
+__test_component: "{{ test_component }}"
+#__test_case_id: "{{ test_case_id | d('PREPARE') }}"
+__test_case_id: "{{ test_case_id | d('') }}"
+
+__test_component__fast_fail: "{{ test_component__fast_fail | d(False) }}"
+__test_component__ignore_errors: "{{ (not (__test_component__fast_fail|bool)) }}"
+__test_result_matched_expected: {}
+
+__test_component__log_prefix: "{{ role_name | upper }}[{{ __test_component }}]:TEST_CASE[{{ __test_case_id }}]"
+__test_component__log_prefix_pretest: "{{ role_name | upper }}[{{ __test_component }}]:[prepare]"
+__test_component__log_pretest: "{{ __test_component__log_prefix_pretest }} |"
+__test_component__log_pretest_setup_test_env: "{{ __test_component__log_prefix_pretest }}:[setup-test-env] |"
+__test_component__log_pretest_source_sshkey: "{{ __test_component__log_prefix_pretest }}:[source-ssh-key-from-vault] |"
+__test_component__log_prefix_posttest: "{{ __test_component__log_prefix }}:[post-test]"
+__test_component__log_posttest: "{{ __test_component__log_prefix_posttest }} |"
+__test_component__log_posttest_remove_users: "{{ __test_component__log_prefix_posttest }}:[remove-test-users] |"
+__test_component__log_posttest_remove_test_in_progress: "{{ 
+  __test_component__log_prefix_posttest }}:[remove-test-in-progress] |"
+__test_component__log_reset: "{{ __test_component__log_prefix }}:[reset] |"
+__test_component__log_run_test: "{{ __test_component__log_prefix }}:[run-test] |"
+__test_component__log_component_test: "{{ __test_component__log_prefix }}:[run-component-test] |"
+__test_component__log_role_test: "{{ __test_component__log_prefix }}:[run-role-test] |"
+__test_component__log_process_test_results: "{{ __test_component__log_prefix }}:[process-test-results] |"
+__test_component__log_save_component_report: "{{ __test_component__log_prefix }}:[save-test-component-report] |"
+__test_component__log_save_test_summary: "{{ __test_component__log_prefix }}:[save-test-summary] |"
+__test_component__log_save_test_results: "{{ __test_component__log_prefix }}:[save-test-results] |"
+__test_component__log_finish_test: "{{ __test_component__log_prefix }}:[finish-test-run] |"
+
+__test_component__report_results: {}
+__test_component__report_results_detailed: {}
+
+__test_component__summary_report_columns:
+  - name: test_case_count
+    header: test_case_count
+  - name: test_collection
+    header: test_collection
+  - name: test_collection_version
+    header: test_collection_version
+  - name: test_component
+    header: test_component
+  - name: test_date
+    header: test_date
+  - name: test_failed
+    header: test_failed
+  - name: test_details_link
+    header: test_details_link
+
+__test_component__report_columns:
+  - name: test_count
+    header: test_case_count
+  - name: test_collection
+    header: test_collection
+  - name: test_collection_version
+    header: test_collection_version
+  - name: test_component
+    header: test_component
+  - name: test_job_link
+    header: test_job_link
+  - name: test_component_git_branch
+    header: test_component_git_branch
+  - name: test_component_git_commit_hash
+    header: test_component_git_commit_hash
+  - name: test_case_id
+    header: test_case_id
+  - name: test_date
+    header: test_date
+  - name: test_description
+    header: test_description
+  - name: test_failed
+    header: test_failed
+  - name: test_details_link
+    header: test_details_link
+#  - name: validate_changed
+#    header: validate_changed
+#  - name: validate_failed
+#    header: validate_failed
+#  - name: validate_msg
+#    header: validate_msg
+#  - name: validate_results
+#    header: validate_results
+
+__test_component__disable_cleanup_default: no
+__test_component__disable_reset_env_default: no
+__test_component__ignore_already_running_default: no
+__test_component__reset_already_running_default: yes
+
+__test_component__disable_cleanup: "{{ test_component__disable_cleanup 
+  | d(__test_component__disable_cleanup_default) }}"
+__test_component__disable_reset_env: "{{ test_component__disable_reset_env 
+  | d(__test_component__disable_reset_env_default) }}"
+__test_component__ignore_already_running: "{{ test_component__ignore_already_running 
+  | d(__test_component__ignore_already_running_default) }}"
+__test_component__reset_already_running: "{{ test_component__reset_already_running 
+  | d(__test_component__reset_already_running_default) }}"
+
+__test_component__git_test_results_enabled: "{{ test_component__git_test_results_enabled | d(False) }}"
+
+__test_component__git_repo_url: "{{ test_component__git_repo_url }}"
+__test_component__git_repo_branch_default: main
+__test_component__git_repo_branch: "{{ test_component__git_repo_branch 
+  | d(__test_component__git_repo_branch_default) }}"
+__test_component__git_ssh_private_key: "{{ test_component__git_ssh_private_key }}"
+#__test_component__git_ssh_private_keydir: "{{ test_component__git_ssh_private_keydir | d('~/.ssh' | expanduser) }}"
+__test_component__git_ssh_private_keydir: "{{ test_component__git_ssh_private_keydir }}"
+__test_component__git_ssh_private_keyfile_default: "{{ 
+  __test_component__git_ssh_private_keydir }}/ansible_repo.dettonville.key"
+__test_component__git_ssh_private_keyfile: "{{ test_component__git_ssh_private_keyfile
+  | d(__test_component__git_ssh_private_keyfile_default) }}"
+__test_component__git_ssh_params:
+  accept_hostkey: true
+  key_file: "{{ __test_component__git_ssh_private_keyfile }}"
+
+__test_component__test_base_dir: "{{ test_component__test_base_dir }}"
+#__test_component__test_run_base_dir_default: "{{ __test_component__test_base_dir }}"
+#__test_component__test_run_base_dir: "{{ test_component__test_run_base_dir
+#  | d(__test_component__test_run_base_dir_default) }}"
+
+__test_component__git_user: "{{ test_component__git_user }}"
+__test_component__git_email: "{{ test_component__git_email }}"
+__test_component__git_repo_dir: "{{ __test_component__test_base_dir }}"
+__test_component__git_comment_prefix: "{{ test_component__git_comment_prefix | d('') }}"
+__test_component__git_reset_test_dir: yes
+#__test_component__git_reset_component_dir: "{{ test_component__git_reset_component_dir | d(False) }}"
+__test_component__git_reset_component_dir: "{{ test_component__git_reset_component_dir 
+  | d(test_component__test_case_id_list|d([])|length==0) }}"
+#__test_component__git_reset_test_base_dir: "{{ ansible_run_tags|d([])|length==0 }}"
+__test_component__git_reset_test_base_dir: no
+
+####################
+## Test Repo Dir configs
+####################
+#__test_component__base_dir_default: "tests/{{ __test_component__collection.split('.') | join('/') }}"
+__test_component__base_dir_default: "tests/{{ __test_component__collection_namespace }}/{{ 
+  __test_component__collection_name }}/{{ __test_component__git_branch_abbrev }}"
+__test_component__base_dir: "{{ test_component__base_dir | d(__test_component__base_dir_default) }}"
+__test_component__component_dir: "{{ __test_component__base_dir }}/{{ __test_component }}"
+__test_component__run_dir: "{{ __test_component__component_dir }}/testrun"
+
+__test_file_start_dir: "{{ __test_component__component_dir }}/test.start"
+__test_file_results_base_dir: "{{ __test_component__component_dir }}/test.results"
+
+__test_file_format_default: "yml"
+__test_file_format: "yml"
+__test_file_testdata_prefix: "testdata"
+__test_file_default: "{{ __test_file_testdata_prefix }}.{{ __test_file_format }}"
+__test_file: "{{ test_component__test_file | d(__test_file_default) }}"
+__test_file_path: "{{ __test_component__run_dir }}/{{ __test_file }}"
+
+__test_file_testresult_prefix: "testdata"
+__test_file_test_data: "{{ __test_file_testresult_prefix }}.testcase.yml"
+__test_file_results: "{{ __test_file_testresult_prefix }}.results.{{ __test_file_format }}"
+__test_file_results_csv: "{{ __test_file_testresult_prefix }}.results.csv"
+__test_file_results_md: "{{ __test_file_testresult_prefix }}.results.md"
+__test_file_expected: "{{ __test_file_testresult_prefix }}.expected.{{ __test_file_format }}"
+__test_file_diff: "{{ __test_file_testresult_prefix }}.diff.txt"
+
+__test_report_results_file: "test-results.yml"
+__test_report_results_detailed_file: "test-results.detailed.yml"
+__test_report_results_csv: "{{ __test_report_results_file.split('.') | first }}.csv"
+__test_report_results_md: "{{ __test_report_results_file.split('.') | first }}.md"
+
+__test_in_progress_file: ".ansible-test.in-progress.txt"
+
+__test_report_summary_detailed_results_csv: "{{ __test_report_results_file.split('.') | first }}.detailed.csv"
+__test_report_summary_detailed_results_md: "{{ __test_report_results_file.split('.') | first }}.detailed.md"
+__test_report_summary_results_md: "{{ __test_report_results_file.split('.') | first }}.md"
+
+__test_runtime_info:
+  test_collection: "{{ __test_component__collection }}"
+  test_collection_version: "{{ __test_component__collection_version }}"
+  ansible_job_url: "{{ __test_component__test_job_url }}"
+  ansible_run_tags: "{{ ansible_run_tags | d([]) }}"
+  ansible_limit: "{{ ansible_limit | d([]) }}"
+  ansible_version: "{{ ansible_version | d('') }}"
+  ansible_python_interpreter: "{{ ansible_python_interpreter | d('') }}"
+  discovered_interpreter_python: "{{ discovered_interpreter_python | d('') }}"
+  ansible_python_version: "{{ ansible_python_version | d('') }}"
+  ansible_connection: "{{ ansible_connection | d('') }}"
+  ansible_os_family: "{{ ansible_os_family | d('') }}"
+  ansible_distribution: "{{ ansible_distribution | d('') }}"
+  ansible_distribution_release: "{{ ansible_distribution_release | d('') }}"
+  ansible_distribution_version: "{{ ansible_distribution_version | d('') }}"
+  ansible_user: "{{ ansible_user | d('') }}"
+  ansible_host: "{{ ansible_host }}"
+  ansible_nodename: "{{ ansible_nodename }}"
+  ansible_controller_vars: "{{ vars | dict2items | selectattr('key', 'match', '^tower.*') | list | items2dict }}"
+
+## the insertion-order preservation nature of dict objects has been declared to be an official part
+##  of the Python language spec for versions 3.7+
+## ref: https://stackoverflow.com/questions/5629023/order-of-keys-in-dictionaries-in-old-versions-of-python
+__dict_ordered_keys_supported: "{{ True if ansible_python_version is version('3.7', '>=') else False }}"

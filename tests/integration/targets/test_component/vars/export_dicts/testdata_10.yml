@@ -1,0 +1,15 @@
+---
+
+test_description: "non-existing file directory test"
+test_dir: "{{ __test_component__vars.test_invalid_directory }}"
+test_file_format: "csv"
+
+export_list:
+  - { key1: "value11", key2: "value12", key3: "value13", key4: "value14" }
+  - { key1: "value21", key2: "value22", key3: "value23", key4: "value24" }
+  - { key1: "value31", key2: "value32", key3: "value33", key4: "value34" }
+
+test_expected:
+  changed: no
+  failed: yes
+  msg: "Destination directory .*{{ __test_component__vars.test_invalid_directory }} does not exist!"

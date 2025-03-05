@@ -1,0 +1,47 @@
+---
+
+test_description: "SSH - add test file with remote alias defined"
+
+git_url: "{{ __test_component__git_repo_url }}"
+git_path: "{{ __test_component__test_base_dir }}"
+git_branch: "{{ __test_component__git_repo_branch }}"
+git_comment: "{{ __test_component__git_comment_prefix }} - SSH - add test file with remote alias defined"
+git_remote: origin
+git_ssh_params: "{{ __test_component__git_ssh_params }}"
+
+test_expected:
+  changed: yes
+  failed: no
+
+test_files:
+  - file_path: foobar123.yml
+    content:
+      all:
+        children:
+          admin_qa_site1:
+            vars:
+              infra_group: DCC
+        hosts:
+          admin01.qa.site1.example.int:
+            trace_var: host_vars/admin01.qa.site1.example.int
+          admin02.qa.site1.example.int:
+            trace_var: host_vars/admin02.qa.site1.example.int
+          app01.qa.site1.example.int:
+            trace_var: host_vars/app01.qa.site1.example.int
+          app02.qa.site1.example.int:
+            trace_var: host_vars/app02.qa.site1.example.int
+          vmlnx123.qa.site1.example.int:
+            provisioning_data:
+              infra_group: AIM
+          vmlnx124.qa.site1.example.int:
+            provisioning_data:
+              infra_group: AIM
+          web01.qa.site1.example.int:
+            provisioning_data:
+              jira_id: AIM-1101
+            trace_var: host_vars/web01.qa.site1.example.int
+          web02.qa.site1.example.int:
+            provisioning_data:
+              infra_group: DCC
+              jira_id: AIM-1102
+            trace_var: host_vars/web02.qa.site1.example.int

@@ -1,0 +1,47 @@
+---
+
+## Clone, initialize, and add/commit/push the test repo with test data
+- name: "{{ __test_component__log_finish_test }} Reset: Pull latest repo changes into {{ __test_component__test_base_dir }}"
+  when: __test_component__git_test_results_enabled|bool
+  dettonville.utils.git_pacp:
+    action: pull
+    path: "{{ __test_component__test_base_dir }}"
+    branch: "{{ __test_component__git_repo_branch }}"
+    url: "{{ __test_component__git_repo_url }}"
+    ssh_params: "{{ __test_component__git_ssh_params }}"
+  register: clone_test_repo_result
+
+- name: "{{ __test_component__log_finish_test }} Save __test_component__report_results to component report"
+  when: __test_component__report_results is defined
+  include_tasks: save-test-component-report.yml
+
+- name: "{{ __test_component__log_finish_test }} Save __test_component__report_results to collection summary report"
+  when: __test_component__report_results is defined
+  include_tasks: save-test-summary.yml
+
+- name: "{{ __test_component__log_finish_test }} Remove test in progress file at {{ __test_component__test_base_dir }}/{{ __test_component__base_dir }}/{{ __test_in_progress_file }}"
+  file:
+    path: "{{ __test_component__test_base_dir }}/{{ __test_component__base_dir }}/{{ __test_in_progress_file }}"
+    state: absent
+
+- name: "{{ __test_component__log_finish_test }} Set __test_component__git_comment"
+  set_fact:
+    __test_component__git_comment: "{{ __test_component__git_comment_prefix }} - ansible integration test: cleanup {{ __test_in_progress_file }}"
+
+- name: "{{ __test_component__log_finish_test }} Display __test_component__test_base_dir"
+  debug:
+    var: __test_component__test_base_dir
+
+- name: "{{ __test_component__log_finish_test }} Git ACP update"
+  when: __test_component__git_test_results_enabled|bool
+  dettonville.utils.git_pacp:
+    url: "{{ __test_component__git_repo_url }}"
+    path: "{{ __test_component__test_base_dir }}"
+    branch: "{{ __test_component__git_repo_branch }}"
+    comment: "{{ __test_component__git_comment }}"
+    ssh_params: "{{ __test_component__git_ssh_params }}"
+  register: git_pacp_result
+
+- name: "{{ __test_component__log_finish_test }} Display git_pacp_result"
+  debug:
+    var: git_pacp_result

@@ -1,0 +1,11 @@
+---
+
+test_description: "csv test - empty export list"
+test_file_format: "csv"
+
+export_list: []
+
+test_expected:
+  changed: yes
+  failed: no
+  message: "The csv file has been created successfully at .*/{{ __test_file }}"

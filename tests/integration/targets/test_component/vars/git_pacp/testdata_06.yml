@@ -1,0 +1,25 @@
+---
+
+test_description: "SSH - remove test file"
+
+git_url: "{{ __test_component__git_repo_url }}"
+git_path: "{{ __test_component__test_base_dir }}"
+git_branch: "{{ __test_component__git_repo_branch }}"
+git_comment: "{{ __test_component__git_comment_prefix }} - SSH - remove test file"
+git_ssh_params: "{{ __test_component__git_ssh_params }}"
+
+test_expected:
+  changed: yes
+  failed: no
+
+test_start_data:
+  - file_path: group_vars/app123.yml
+    content:
+      appname: app123
+  - file_path: host_vars/testhost124.yml
+    content:
+      linux_firewalld__enabled: true
+
+test_files:
+  - file_path: host_vars/testhost124.yml
+    state: absent

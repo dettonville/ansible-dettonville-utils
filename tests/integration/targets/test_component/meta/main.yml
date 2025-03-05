@@ -1,0 +1,5 @@
+#dependencies:
+##- setup_remote_tmp_dir
+
+## ref: https://docs.ansible.com/ansible/latest/user_guide/playbooks_reuse_roles.html#using-roles
+allow_duplicates: yes

@@ -1,0 +1,148 @@
+---
+
+- name: "{{ __test_component__log_reset }} Pull latest repo changes into {{ __test_component__test_base_dir }}"
+  when: (__test_component__git_test_results_enabled|bool) or __test_component == 'git_pacp'
+  dettonville.utils.git_pacp:
+    action: pull
+    path: "{{ __test_component__test_base_dir }}"
+    branch: "{{ __test_component__git_repo_branch }}"
+    url: "{{ __test_component__git_repo_url }}"
+    ssh_params: "{{ __test_component__git_ssh_params }}"
+  register: __test_component__git_pull_result
+
+- name: "{{ __test_component__log_reset }} Display __test_component__git_pull_result"
+  debug:
+    var: __test_component__git_pull_result
+
+- name: "{{ __test_component__log_reset }} Reset test dir {{ __test_component__run_dir }}"
+#  when: __test_component__git_reset_test_dir|d(True)|bool
+  file:
+    path: "{{ __test_component__test_base_dir }}/{{ __test_component__run_dir }}"
+    state: absent
+
+- name: "{{ __test_component__log_reset }} Ensure __test_component__run_dir directory exists"
+  file:
+    path: "{{ __test_component__test_base_dir }}/{{ __test_component__run_dir }}"
+    state: directory
+
+- name: "{{ __test_component__log_reset }} Set __test_file_results_dir"
+  set_fact:
+    __test_file_results_dir: "{{ __test_file_results_base_dir }}/test_{{ __test_case_id }}"
+
+- name: "{{ __test_component__log_reset }} Create test case starting data"
+  when: __test_data.test_start_data|d([])|length>0
+  block:
+  - name: "{{ __test_component__log_reset }} Create test case starting data directory"
+    when: item.file_path | dirname | length>0
+    file:
+      path: "{{ __test_component__test_base_dir }}/{{ __test_component__run_dir }}/{{ item.file_path | dirname }}"
+      state: directory
+    loop: "{{ __test_data.test_start_data }}"
+
+  - name: "{{ __test_component__log_reset }} Create test case starting data"
+    copy:
+      content: "{{ item.content | to_nice_yaml(indent=2) }}"
+      dest: "{{ __test_component__test_base_dir }}/{{ __test_component__run_dir }}/{{ item.file_path }}"
+    loop: "{{ __test_data.test_start_data }}"
+
+- name: "{{ __test_component__log_reset }} Set up test output file vars"
+  when: __test_component__vars.test_result_output_file|d(False)|bool or
+    __test_component__vars.test_result_output_file_slurp|d(False)|bool
+#  when: __test_component__vars.test_result_output_file|d(False)|bool
+  block:
+
+  - name: "{{ __test_component__log_reset }} Set __test_file_format"
+    set_fact:
+      __test_file_format: "{{ __test_data.test_file_format
+        | d(__test_component__vars.test_file_format) | d(__test_file_format_default) }}"
+
+  - name: "{{ __test_component__log_reset }} Display __test_file_format [0]"
+    debug:
+      var: __test_file_format
+
+  - name: "{{ __test_component__log_reset }} Set __test_dir"
+    set_fact:
+      __test_dir: "{{ __test_data.test_dir | d(__test_component__run_dir) }}"
+
+  - name: "{{ __test_component__log_reset }} Display __test_dir"
+    debug:
+      var: __test_dir
+
+  - name: "{{ __test_component__log_reset }} Set __test_file_default"
+    set_fact:
+      __test_file_default: "{{ __test_component__vars.test_file | d(__test_file_default) }}"
+#      __test_file_default: "{{ __test_file_testdata_prefix }}.{{ __test_file_format }}"
+
+  - name: "{{ __test_component__log_reset }} Set __test_file"
+    set_fact:
+      __test_file: "{{ __test_data.file | d(__test_file_default) }}"
+
+  - name: "{{ __test_component__log_reset }} Display __test_file"
+    debug:
+      var: __test_file
+
+  - name: "{{ __test_component__log_reset }} Display __test_data"
+    debug:
+      var: __test_data
+
+  - name: "{{ __test_component__log_reset }} Override __test_file_format if implied"
+    when:
+      - __test_data.file is defined
+      - __test_data.test_file_format is not defined
+    block:
+    - name: "{{ __test_component__log_reset }} Override __test_file_format if implied"
+      set_fact:
+        __test_file_format: "{{ __test_data.file.split('.')[-1] }}"
+
+    - name: "{{ __test_component__log_reset }} Display __test_file_format [1]"
+      debug:
+        var: __test_file_format
+
+  - name: "{{ __test_component__log_reset }} Set __test_file_expected"
+    set_fact:
+      __test_file_expected: "{{ __test_file_testresult_prefix }}.expected.{{ __test_file_format }}"
+
+  - name: "{{ __test_component__log_reset }} Display __test_file_expected"
+    debug:
+      var: __test_file_expected
+
+  - name: "{{ __test_component__log_reset }} Set __test_file_path"
+    set_fact:
+      __test_file_path: "{{ __test_dir }}/{{ __test_file }}"
+
+  - name: "{{ __test_component__log_reset }} Display __test_file_path"
+    debug:
+      var: __test_file_path
+
+  - name: "{{ __test_component__log_reset }} Set __test_output_file_path"
+    set_fact:
+      __test_output_file_path: "{{ __test_component__test_base_dir }}/{{ __test_file_path }}"
+#      __test_output_file_path: "{{ __test_component__test_base_dir }}/{{ __test_file_path }}"
+
+  - name: "{{ __test_component__log_reset }} Display __test_output_file_path"
+    debug:
+      var: __test_output_file_path
+
+  - name: "{{ __test_component__log_reset }} Initialize {{ __test_output_file_path }}"
+    file:
+      path: "{{ __test_output_file_path }}"
+      state: absent
+
+- name: "{{ __test_component__log_reset }} Set __test_component__git_comment"
+  set_fact:
+    __test_component__git_comment: "{{ __test_component__git_comment_prefix }} - {{ __test_component__log_prefix }} Reset test file to start"
+
+- name: "{{ __test_component__log_reset }} Git ACP update"
+  when: (__test_component__git_test_results_enabled|bool) or __test_component == 'git_pacp'
+  dettonville.utils.git_pacp:
+    url: "{{ __test_component__git_repo_url }}"
+    path: "{{ __test_component__test_base_dir }}"
+    branch: "{{ __test_component__git_repo_branch }}"
+    comment: "{{ __test_component__git_comment }}"
+    ssh_params: "{{ __test_component__git_ssh_params }}"
+  register: __test_component__git_pacp_result
+
+- name: "{{ __test_component__log_reset }} Display __test_component__git_pacp_result"
+  debug:
+    var: __test_component__git_pacp_result
+    verbosity: 1

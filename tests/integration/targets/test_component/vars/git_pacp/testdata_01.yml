@@ -1,0 +1,14 @@
+---
+
+test_description: "SSH - NO-OP - expect result with changed: false"
+
+git_url: "{{ __test_component__git_repo_url }}"
+git_path: "{{ __test_component__test_base_dir }}"
+git_branch: "{{ __test_component__git_repo_branch }}"
+git_comment: "{{ __test_component__git_comment_prefix }} - SSH - NO-OP - expect result with changed: false"
+git_add: [ "." ]
+git_ssh_params: "{{ __test_component__git_ssh_params }}"
+
+test_expected:
+  changed: no
+  failed: no

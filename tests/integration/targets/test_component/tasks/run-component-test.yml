@@ -1,0 +1,106 @@
+---
+
+- name: "{{ __test_component__log_pretest }} Display __test_component__test_case_var_file"
+  debug:
+    var: __test_component__test_case_var_file
+
+- name: "{{ __test_component__log_pretest }} Set __test_component__test_case_id"
+  set_fact:
+    __test_component__test_case_id: "{{ __test_component__test_case_var_file | basename
+      | regex_replace('^testdata_(.*).yml$', '\\1') }}"
+
+- name: "{{ __test_component__log_pretest }} Set __test_component__vars_dir"
+  set_fact:
+    __test_component__vars_dir: "{{ role_path }}/vars/"
+
+- name: "{{ __test_component__log_pretest }} Set __test_component__test_case_group_dir"
+  set_fact:
+    __test_component__test_case_dir: "{{ __test_component__test_case_var_file | dirname | replace(__test_component__vars_dir, '') }}"
+
+- name: "{{ __test_component__log_pretest }} Display __test_component__test_case_dir"
+  debug:
+    var: __test_component__test_case_dir
+
+- name: "{{ __test_component__log_pretest }} Display __test_component__test_case_id"
+  debug:
+    var: __test_component__test_case_id
+
+- name: "{{ __test_component__log_pretest }} Load test data from {{ __test_component__test_case_var_file }}"
+  include_vars:
+    file: "{{ __test_component__test_case_var_file }}"
+    name: __test_data
+#  no_log: true
+
+- name: "{{ __test_component__log_pretest }} Display __test_data"
+  debug:
+    var: __test_data
+
+- name: "{{ __test_component__log_pretest }} Set __test_case_id"
+  set_fact:
+    __test_case_id: "{{ __test_component__test_case_id }}"
+#    __test_case_id: "{{ __test_data.test_case_id | d(__test_component__test_case_id) }}"
+
+- name: "{{ __test_component__log_pretest }} Display __test_case_id"
+  debug:
+    var: __test_case_id
+
+- name: "{{ __test_component__log_pretest }} Init __test_filter_module_result"
+  set_fact:
+    __test_filter_module_result: {}
+
+## Known issue : "junit.CallbackModule: Duplicate host callback"
+## https://github.com/ansible/ansible/issues/50168
+## https://github.com/ansible/ansible/commit/8f1b48714113538ae71eaf7c12199a788a00738a
+- name: "{{ __test_component__log_component_test }} Validate test component vars are defined"
+  assert:
+    that:
+      - __test_case_id is defined
+      - __test_component is defined
+      - __test_file_results_base_dir is defined
+      - __test_file_results is defined
+      - __test_file_results_csv is defined
+      - __test_file_results_md is defined
+#      - __test_file_expected is defined
+      - __test_component__test_base_dir is defined
+      - __test_component__git_comment_prefix is defined
+      - __test_component__git_repo_url is defined
+      - __test_component__git_repo_branch is defined
+      - __test_component__git_ssh_params is defined
+
+- name: "{{ __test_component__log_component_test }} Assert __test_data set for {{ __test_component }}"
+  assert:
+    that:
+      - __test_data is defined
+      - __test_data.test_description is defined
+      - __test_data.test_expected is defined
+
+- name: "{{ __test_component__log_component_test }} Run test case if active"
+  when:
+    - __test_data.active|d(True)|bool
+    - not __skip_test|d(False)|bool
+  block:
+
+  - name: "{{ __test_component__log_reset }} Set __test_file_results_dir"
+    set_fact:
+      __test_file_results_dir: "{{ __test_file_results_base_dir }}/test_{{ __test_case_id }}"
+
+  - name: "{{ __test_component__log_reset }} Display __test_file_results_dir"
+    debug:
+      var: __test_file_results_dir
+
+  - name: "{{ __test_component__log_component_test }} Reset test data to start"
+    when: __test_data.reset_required|d(__test_component__data_reset_required)|d(True)|bool
+    include_tasks: reset-test-data.yml
+
+  - name: "{{ __test_component__log_component_test }} Run test on {{ __test_component__collection }}.{{ __test_component }}"
+    include_tasks: "tests/{{ __test_component }}.yml"
+
+  - name: "{{ __test_component__log_component_test }} Save test results"
+    include_tasks: save-test-results.yml
+
+  - name: "{{ __test_component__log_component_test }} Process Test Results"
+    include_tasks: process-test-results.yml
+
+  - name: "{{ __test_component__log_component_test }} Save __test_component__report_results"
+    when: __test_component__report_results is defined
+    include_tasks: finish-test-run.yml

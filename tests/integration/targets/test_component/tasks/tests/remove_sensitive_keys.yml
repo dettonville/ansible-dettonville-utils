@@ -1,0 +1,66 @@
+---
+
+- name: "{{ __test_component__log_run_test }} Run test on {{ __test_component__collection }}.{{ __test_component }}"
+  ignore_errors: yes
+  when:
+    - __test_data['key_patterns'] is undefined
+    - __test_data['additional_key_patterns'] is undefined
+  set_fact:
+    __test_filter_result: "{{ __test_data.test_object | dettonville.utils.remove_sensitive_keys }}"
+  register: __test_component__test_result
+
+- name: "{{ __test_component__log_run_test }} Run test on {{ __test_component__collection }}.{{ __test_component }} for defined key_patterns"
+  ignore_errors: yes
+  when:
+    - __test_data['key_patterns'] is defined
+    - __test_data['additional_key_patterns'] is undefined
+  set_fact:
+    __test_filter_result: "{{ __test_data.test_object 
+      | dettonville.utils.remove_sensitive_keys(key_patterns=__test_data.key_patterns) }}"
+  register: __test_component__test_result
+
+- name: "{{ __test_component__log_run_test }} Run test on {{ __test_component__collection }}.{{ __test_component }} for defined additional_key_patterns"
+  ignore_errors: yes
+  when:
+    - __test_data['key_patterns'] is undefined
+    - __test_data['additional_key_patterns'] is defined
+  set_fact:
+    __test_filter_result: "{{ __test_data.test_object 
+      | dettonville.utils.remove_sensitive_keys(additional_key_patterns=__test_data.additional_key_patterns) }}"
+  register: __test_component__test_result
+
+- name: "{{ __test_component__log_run_test }} Run test on {{ __test_component__collection }}.{{ __test_component }} for defined key_patterns and additional_key_patterns"
+  ignore_errors: yes
+  when:
+    - __test_data['key_patterns'] is defined
+    - __test_data['additional_key_patterns'] is defined
+  set_fact:
+    __test_filter_result: "{{ __test_data.test_object 
+      | dettonville.utils.remove_sensitive_keys(
+        key_patterns=__test_data.key_patterns, 
+        additional_key_patterns=__test_data.additional_key_patterns) }}"
+  register: __test_component__test_result
+
+- name: "{{ __test_component__log_run_test }} Display __test_component__test_result"
+  debug:
+    var: __test_component__test_result
+
+- name: "{{ __test_component__log_run_test }} Sort keys if __test_data.sort_keys defined"
+  when: __test_data['sort_keys'] is defined
+  set_fact:
+    __test_filter_result: "{{ __test_filter_result 
+      | dettonville.utils.sort_dict_list(__test_data.sort_keys) }}"
+
+- name: "{{ __test_component__log_run_test }} Display __test_filter_result"
+  debug:
+    var: __test_filter_result
+    verbosity: 1
+
+- name: "{{ __test_component__log_run_test }} Set __test_filter_module_result"
+  set_fact:
+    __test_filter_module_result:
+      result: "{{ __test_filter_result }}"
+
+- name: "{{ __test_component__log_run_test }} Display __test_filter_module_result"
+  debug:
+    var: __test_filter_module_result

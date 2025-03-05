@@ -1,0 +1,202 @@
+---
+
+- name: "init-test-vars | Display test_case_id_list_string"
+  debug:
+    var: test_case_id_list_string|d('')
+
+- name: "init-test-vars | Set test_case_id_list"
+  when: test_case_id_list_string|d('')|length>0
+  set_fact:
+    test_case_id_list: "{{ test_case_id_list | d(test_case_id_list_string.split(',') | list) }}"
+
+- name: "init-test-vars | Display test_case_id_list"
+  debug:
+    var: test_case_id_list
+
+- name: "init-test-vars | Init __test_git_branch"
+  set_fact:
+    __test_git_branch: "{{ test_git_branch 
+      | d(tower_job_scm_branch) 
+      | d(awx_job_scm_branch) 
+      | d(tower_project_scm_branch) 
+      | d(awx_project_scm_branch) 
+      | d('') }}"
+
+- name: "init-test-vars | Init __test_git_commit_hash"
+  set_fact:
+    __test_git_commit_hash: "{{ test_git_commit_hash 
+      | d(tower_project_revision) 
+      | d(awx_project_revision)    
+      | d('') }}"
+
+- name: "init-test-vars | Set __test_git_branch"
+  when: __test_git_branch|length==0
+  block:
+
+  - name: "init-test-vars | Get git branch for current repo"
+    command: "git rev-parse --abbrev-ref HEAD"
+    register: __git_branch_result
+
+  - name: "init-test-vars | Display __git_branch_result"
+    debug:
+      var: __git_branch_result
+
+  - name: "init-test-vars | Set __test_git_branch"
+    when: (__git_branch_result.stdout_lines | length ) > 0
+    set_fact:
+      __test_git_branch: "{{ __git_branch_result.stdout|d('') }}"
+
+## ref: https://stackoverflow.com/questions/59869843/ansible-awx-get-project-url-and-user
+- name: "init-test-vars | Display tower vars"
+  debug:
+    var: vars | dict2items
+          | selectattr('key', 'match', '^tower.*')
+          | list | items2dict
+
+- name: "init-test-vars | Set __test_git_commit_hash using local git repo info"
+  when:
+    - __test_git_commit_hash|d('')|length==0
+    - tower_project_revision|d('')|length==0
+    - awx_project_revision|d('')|length==0
+  block:
+
+  ## ref: https://stackoverflow.com/questions/949314/how-do-i-get-the-hash-for-the-current-commit-in-git
+  - name: "init-test-vars | Get current git commit hash for repo"
+    command: "git rev-parse HEAD"
+    register: __git_commit_hash_result
+
+  - name: "init-test-vars | Display __git_commit_hash_result"
+    debug:
+      var: __git_commit_hash_result
+
+  - name: "init-test-vars | Set __test_git_commit_hash"
+    when: (__git_commit_hash_result.stdout_lines | length ) > 0
+    set_fact:
+      __test_git_commit_hash: "{{ __git_commit_hash_result.stdout_lines[0] }}"
+
+- name: "init-test-vars | Set __test_git_commit_hash using local git repo info"
+  when:
+    - __test_git_commit_hash|d('')|length>0
+    - __test_git_commit_hash_short|d('')|length==0
+  block:
+
+  - name: "init-test-vars | Set __test_git_commit_hash_short (first 7 chars of hash)"
+    set_fact:
+      __test_git_commit_hash_short: "{{ __test_git_commit_hash[:7] }}"
+
+#  ## ref: https://stackoverflow.com/questions/949314/how-do-i-get-the-hash-for-the-current-commit-in-git
+#  - name: "init-test-vars | Get current git short commit hash for repo"
+#    command: "git rev-parse --short HEAD"
+#    register: __git_commit_hash_short_result
+#
+#  - name: "init-test-vars | Display __git_commit_hash_short_result"
+#    debug:
+#      var: __git_commit_hash_short_result
+#
+#  - name: "init-test-vars | Set __test_git_commit_hash_short"
+#    when: (__git_commit_hash_short_result.stdout_lines | length ) > 0
+#    set_fact:
+#      __test_git_commit_hash_short: "{{ __git_commit_hash_short_result.stdout_lines[0] }}"
+
+- name: "init-test-vars | Display git information"
+  debug:
+    msg:
+      - "__test_git_branch={{ __test_git_branch }}"
+      - "__test_git_commit_hash={{ __test_git_commit_hash }}"
+      - "__test_git_commit_hash_short={{ __test_git_commit_hash_short }}"
+
+- name: "init-test-vars | Display ansible_env.AWX_HOST"
+  delegate_to: localhost
+  debug:
+    var: ansible_env.AWX_HOST|d('')
+    verbosity: 1
+
+- name: "init-test-vars | Init __test_job_host"
+  delegate_to: localhost
+  set_fact:
+    __test_job_host: "{{ ansible_env.AWX_HOST 
+      | d(ansible_facts.env.AWX_HOST)
+      | d('') }}"
+
+- name: "init-test-vars | Display __test_job_host"
+  debug:
+    var: __test_job_host
+
+- name: "init-test-vars | Set __test_job_url"
+  set_fact:
+    __test_job_url: "{{ test_job_url | d('') }}"
+
+- name: "init-test-vars | Set __test_job_url"
+  when:
+    - __test_job_url|d('')|length==0
+    - __test_job_host|d('')|length>0
+  block:
+
+  - name: "init-test-vars | Set __test_job_url"
+    set_fact:
+      __test_job_url: "{{ __test_job_host }}/#/jobs/playbook/{{ tower_job_id }}/output"
+
+- name: "init-test-vars | Display __test_job_url"
+  debug:
+    var: __test_job_url
+
+- name: "init-test-vars | Display collection version information"
+  debug:
+    msg:
+      - "dettonville.utils version={{ lookup('community.general.collection_version', 'dettonville.utils') }}"
+
+- name: "init-test-vars | Setup temp dir"
+  import_role:
+    name: setup_remote_tmp_dir
+
+- name: "init-test-vars | Set defaults"
+  set_fact:
+    __test_job__test_base_dir_default: "{{ remote_tmp_dir }}/test.{{ test_component__collection }}"
+#    __test_job__test_run_base_dir_default: "{{ remote_tmp_dir }}/test.git"
+    __test_job__git_ssh_private_keydir_default: "{{ remote_tmp_dir }}"
+    __test_job__raise_final_excp_upon_test_failure_default: true
+
+- name: "init-test-vars | Set __test_job__raise_final_excp_upon_test_failure"
+  set_fact:
+    __test_job__raise_final_excp_upon_test_failure: "{{ test_job__raise_final_excp_upon_test_failure
+      | d(__test_job__raise_final_excp_upon_test_failure_default) }}"
+
+- name: "init-test-vars | Set test dirs"
+  set_fact:
+    __test_job__test_base_dir: "{{ test_job__test_base_dir 
+      | d(__test_job__test_base_dir_default) }}"
+#    __test_job__test_run_base_dir: "{{ test_job__test_run_base_dir
+#      | d(__test_job__test_run_base_dir_default) }}"
+    __test_job__git_ssh_private_keydir: "{{ test_job__git_ssh_private_keydir 
+      | d(__test_job__git_ssh_private_keydir_default) }}"
+
+- name: "init-test-vars | Display test vars"
+  debug:
+    msg:
+      - "__test_job__test_base_dir={{ __test_job__test_base_dir }}"
+#      - "__test_job__test_run_base_dir={{ __test_job__test_run_base_dir }}"
+      - "__test_job__git_ssh_private_keydir={{ __test_job__git_ssh_private_keydir }}"
+      - "__test_job__raise_final_excp_upon_test_failure={{ __test_job__raise_final_excp_upon_test_failure }}"
+
+- name: "init-test-vars | Display common variable information"
+  debug:
+    msg:
+      ## BEGIN ansible special/magic variables
+      ## ref: https://docs.ansible.com/ansible/latest/user_guide/playbooks_vars_facts.html#discovering-variables-facts-and-magic-variables
+      - "ansible_run_tags={{ ansible_run_tags | d([]) }}"
+      - "ansible_limit={{ ansible_limit | d('') }}"
+      - "ansible_version={{ ansible_version | d('') }}"
+      - "discovered_interpreter_python={{ discovered_interpreter_python | d('') }}"
+      - "ansible_python_interpreter={{ ansible_python_interpreter | d('') }}"
+      - "ansible_python_version={{ ansible_python_version | d('') }}"
+      - "ansible_pip_interpreter={{ ansible_pip_interpreter | d('') }}"
+      - "ansible_user={{ ansible_user|d('') }}"
+      - "inventory_hostname={{ inventory_hostname }}"
+      - "ansible_nodename={{ ansible_nodename | d('') }}"
+      - "ansible_host={{ ansible_host }}"
+      - "ansible_hostname={{ ansible_hostname | d('') }}"
+
+- name: "init-test-vars | Display vault information"
+  debug:
+    msg:
+      - "vault_env={{ vault_env | d('') }}"

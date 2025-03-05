@@ -1,0 +1,7 @@
+---
+
+test_result_output_file: yes
+
+test_file_format: csv
+
+test_invalid_directory: "bad/location"

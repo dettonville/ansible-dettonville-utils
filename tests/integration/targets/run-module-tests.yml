@@ -1,0 +1,128 @@
+---
+
+- name: "run-module-tests | Run dettonville.utils module tests"
+  hosts: localhost
+  connection: local
+  become: no
+  vars_files:
+    - ./../integration_config.vault.yml
+    - test-vars.yml
+  tasks:
+
+  - name: "run-module-tests | Init test vars"
+    tags: always
+    import_tasks: init-test-vars.yml
+
+  - name: "run-module-tests | test dettonville.utils.git_pacp"
+    tags: git_pacp
+    import_role:
+      name: test_component
+    vars:
+      test_component: git_pacp
+      test_component__test_base_dir: "{{ __test_job__test_base_dir }}"
+      test_component__test_job_url: "{{ __test_job_url }}"
+      test_component__test_case_id_list: "{{ test_case_id_list | d([]) }}"
+#      test_component__test_run_base_dir: "{{ __test_job__test_run_base_dir }}"
+      test_component__git_ssh_private_keydir: "{{ __test_job__git_ssh_private_keydir }}"
+      test_component__git_branch: "{{ __test_git_branch }}"
+      test_component__git_commit_hash: "{{ __test_git_commit_hash }}"
+      test_component__git_commit_hash_short: "{{ __test_git_commit_hash_short }}"
+
+  - name: "run-module-tests | test dettonville.utils.sort_dict_list"
+    tags: sort_dict_list
+    import_role:
+      name: test_component
+    vars:
+      test_component: sort_dict_list
+      test_component__test_base_dir: "{{ __test_job__test_base_dir }}"
+      test_component__test_job_url: "{{ __test_job_url }}"
+      test_component__test_case_id_list: "{{ test_case_id_list | d([]) }}"
+      test_component__git_ssh_private_keydir: "{{ __test_job__git_ssh_private_keydir }}"
+      test_component__git_branch: "{{ __test_git_branch }}"
+      test_component__git_commit_hash: "{{ __test_git_commit_hash }}"
+      test_component__git_commit_hash_short: "{{ __test_git_commit_hash_short }}"
+
+  - name: "run-module-tests | test dettonville.utils.remove_dict_keys"
+    tags: remove_dict_keys
+    import_role:
+      name: test_component
+    vars:
+      test_component: remove_dict_keys
+      test_component__test_base_dir: "{{ __test_job__test_base_dir }}"
+      test_component__test_job_url: "{{ __test_job_url }}"
+      test_component__test_case_id_list: "{{ test_case_id_list | d([]) }}"
+      test_component__git_ssh_private_keydir: "{{ __test_job__git_ssh_private_keydir }}"
+      test_component__git_branch: "{{ __test_git_branch }}"
+      test_component__git_commit_hash: "{{ __test_git_commit_hash }}"
+      test_component__git_commit_hash_short: "{{ __test_git_commit_hash_short }}"
+
+  - name: "run-module-tests | test dettonville.utils.remove_sensitive_keys"
+    tags: remove_sensitive_keys
+    import_role:
+      name: test_component
+    vars:
+      test_component: remove_sensitive_keys
+      test_component__test_base_dir: "{{ __test_job__test_base_dir }}"
+      test_component__test_job_url: "{{ __test_job_url }}"
+      test_component__test_case_id_list: "{{ test_case_id_list | d([]) }}"
+      test_component__git_ssh_private_keydir: "{{ __test_job__git_ssh_private_keydir }}"
+      test_component__git_branch: "{{ __test_git_branch }}"
+      test_component__git_commit_hash: "{{ __test_git_commit_hash }}"
+      test_component__git_commit_hash_short: "{{ __test_git_commit_hash_short }}"
+
+  - name: "run-module-tests | test dettonville.utils.export_dicts"
+    tags: export_dicts
+    import_role:
+      name: test_component
+    vars:
+      test_component: export_dicts
+      test_component__test_base_dir: "{{ __test_job__test_base_dir }}"
+      test_component__test_job_url: "{{ __test_job_url }}"
+      test_component__test_case_id_list: "{{ test_case_id_list | d([]) }}"
+      test_component__git_ssh_private_keydir: "{{ __test_job__git_ssh_private_keydir }}"
+      test_component__git_branch: "{{ __test_git_branch }}"
+      test_component__git_commit_hash: "{{ __test_git_commit_hash }}"
+      test_component__git_commit_hash_short: "{{ __test_git_commit_hash_short }}"
+
+  - name: "run-module-tests | Report final test results"
+    tags: always
+    when: __test_job__raise_final_excp_upon_test_failure|d(False)|bool
+    block:
+
+      - name: "run-module-tests | Display ansible_run_tags"
+        debug:
+          var: ansible_run_tags | d([])
+
+      - name: "run-module-tests | Set __test_run_results"
+        set_fact:
+          __test_run_results: |-
+            {%- set _test_run_results = {} %}
+            {%- set _ = _test_run_results.update({'test_failed': False }) %}
+            {%- for _test_component in __test_component__report_results %}
+              {% if (ansible_run_tags|d([])|length == 0) or (_test_component in ansible_run_tags) %}
+                {%- set _test_run_component_results = __test_component__report_results.test_components[_test_component] %}
+                {% for _test_case_id, _test_case_result_raw in _test_run_component_results.testcases.items() %}
+                  {%- set _test_case_result = _test_case_result_raw -%}
+                  {%- set _ = _test_case_result.update({ 'test_case_id': _test_case_id}) -%}
+                  {% if (test_case_id_list|d([])|length == 0) or (_test_case_id in test_case_id_list|d([])) %}
+                    {%- set _ = _test_run_results.update({ _test_case_id: _test_case_result }) -%}
+                    {% if (_test_case_result.test_failed) %}
+                      {%- set _ = _test_run_results.update({'test_failed': True }) %}
+                    {% endif %}
+                  {% endif %}
+                {% endfor %}
+              {% endif %}
+            {% endfor %}
+            {{ _test_run_results | to_json | from_json }}
+
+      - name: "run-module-tests | Display __test_run_results"
+        debug:
+          var: __test_run_results
+
+      - name: "run-module-tests | If tests failed, emit failure"
+        when: __test_run_results.__test_failed|d(False)
+        vars:
+          failed_task:
+            result: "{{ __test_run_results }}"
+        fail:
+          msg: "{{ failed_task }}"

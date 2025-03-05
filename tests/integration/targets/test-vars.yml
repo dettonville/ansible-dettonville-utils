@@ -1,0 +1,29 @@
+---
+
+host_key_checking: no
+
+#ansible_python_interpreter: "/usr/bin/python3"
+#ansible_python_interpreter: "python3"
+#ansible_python_interpreter: /usr/bin/python3.8
+#ansible_python_interpreter: "python3.8"
+#ansible_python_interpreter: /usr/bin/env python3
+
+#setup_remote_tmp_dir__disable_cleanup: yes
+
+########
+## Test component vars
+########
+test_component__collection: "dettonville.utils"
+
+test_component__git_repo_url: "git@github.com:dettonville/ansible-test-automation.git"
+test_component__git_repo_branch: "main"
+
+#test_component__test_base_dir: "{{ remote_tmp_dir }}/test.{{ test_component__collection }}"
+
+#test_component__git_test_results_enabled: no
+
+test_component__git_ssh_private_key: "{{ vault__test_repo_git_ssh_private_key }}"
+
+test_component__git_user: "ansible"
+test_component__git_email: "ansible@dettonville.org"
+#test_component__git_comment_prefix: "ITEM-001"

@@ -1,0 +1,258 @@
+---
+
+- name: "{{ __test_component__log_save_test_summary }} Pull latest repo changes into {{ __test_component__test_base_dir }}"
+  when: (__test_component__git_test_results_enabled|bool) or __test_component == 'git_pacp'
+  dettonville.utils.git_pacp:
+    action: pull
+    url: "{{ __test_component__git_repo_url }}"
+    path: "{{ __test_component__test_base_dir }}"
+    branch: "{{ __test_component__git_repo_branch }}"
+    ssh_params: "{{ __test_component__git_ssh_params }}"
+  register: __test_component__git_pull_result
+
+- name: "{{ __test_component__log_save_test_summary }} Assert __test_component__report_results is defined"
+  assert:
+    that: __test_component__report_results is defined
+
+- name: "{{ __test_component__log_save_test_summary }} Check if {{ __test_component__base_dir }}/{{ __test_report_results_file }} exists"
+  no_log: true
+  stat:
+    path: "{{ __test_component__test_base_dir }}/{{ __test_component__base_dir }}/{{ __test_report_results_file }}"
+  register: file_result
+
+- name: "{{ __test_component__log_save_test_summary }} Init __test_report_results with __test_component__report_results"
+  when: not file_result.stat.exists
+  no_log: true
+  set_fact:
+    __test_report_results: "{{ __test_component__report_results }}"
+
+- name: "{{ __test_component__log_save_test_summary }} Get content from {{ __test_component__base_dir }}/{{ __test_report_results_file }}"
+  when: file_result.stat.exists
+  block:
+
+  - name: "{{ __test_component__log_save_test_summary }} Read content from {{ __test_component__base_dir }}/{{ __test_report_results_file }}"
+    no_log: true
+    slurp:
+      src: "{{ __test_component__test_base_dir }}/{{ __test_component__base_dir }}/{{ __test_report_results_file }}"
+    register: __test_report_content
+
+  - name: "{{ __test_component__log_save_test_summary }} Set __test_report_results_file_content"
+    no_log: true
+    set_fact:
+      __test_report_results_file_content: "{{ __test_report_content.content | b64decode | from_yaml | d({}) }}"
+
+  - name: "{{ __test_component__log_save_test_summary }} Display __test_report_results_file_content"
+    debug:
+      var: __test_report_results_file_content
+      verbosity: 2
+
+  # TODO: clear out the key for the specific test case id so no residue of prior run remains
+  - name: "{{ __test_component__log_save_test_summary }} Merge __test_component__report_results into __test_report_results_file_content"
+    no_log: true
+    set_fact:
+      __test_report_results: "{{ __test_report_results_file_content.test_results 
+        | combine(__test_component__report_results, recursive=True) }}"
+
+- name: "{{ __test_component__log_save_test_summary }} Check if {{ __test_component__base_dir }}/{{ __test_report_results_detailed_file }} exists"
+  no_log: true
+  stat:
+    path: "{{ __test_component__test_base_dir }}/{{ __test_component__base_dir }}/{{ __test_report_results_detailed_file }}"
+  register: file_detailed_result
+
+- name: "{{ __test_component__log_save_test_summary }} Init __test_report_results_detailed with __test_component__report_results_detailed"
+  when: not file_detailed_result.stat.exists
+  no_log: true
+  set_fact:
+    __test_report_results_detailed: "{{ __test_component__report_results_detailed }}"
+
+- name: "{{ __test_component__log_save_test_summary }} Get content from {{ __test_component__base_dir }}/{{ __test_report_results_detailed_file }}"
+  when: file_detailed_result.stat.exists
+  block:
+
+  - name: "{{ __test_component__log_save_test_summary }} Read content from {{ __test_component__base_dir }}/{{ __test_report_results_detailed_file }}"
+    no_log: true
+    slurp:
+      src: "{{ __test_component__test_base_dir }}/{{ __test_component__base_dir }}/{{ __test_report_results_detailed_file }}"
+    register: __test_report_content_detailed
+
+  - name: "{{ __test_component__log_save_test_summary }} Set __test_report_results_file_content_detailed"
+    no_log: true
+    set_fact:
+      __test_report_results_file_content_detailed: "{{ __test_report_content_detailed.content | b64decode | from_yaml | d({}) }}"
+
+  - name: "{{ __test_component__log_save_test_summary }} Display __test_report_results_file_content_detailed"
+    debug:
+      var: __test_report_results_file_content_detailed
+      verbosity: 3
+
+  - name: "{{ __test_component__log_save_test_summary }} Merge __test_component__report_results_detailed into __test_report_results_file_content_detailed"
+    no_log: true
+    set_fact:
+      __test_report_results_detailed: "{{ __test_report_results_file_content_detailed.test_results 
+        | combine(__test_component__report_results_detailed, recursive=True) }}"
+
+- name: "{{ __test_component__log_save_test_summary }} Display __test_report_results[0]"
+  debug:
+    var: __test_report_results
+    verbosity: 1
+
+- name: "{{ __test_component__log_save_test_summary }} Flatten results to __test_report_summary_results_flattened"
+  no_log: true
+  set_fact:
+    __test_report_summary_results_flattened: "{{ _test_results|from_yaml }}"
+  vars:
+    _test_results: |-
+      {% for _test_component, _test_component_results in __test_report_results.test_components.items() %}
+      {% if _test_component_results['testcases'] is mapping %}
+      - {
+          'test_case_count': "{{ _test_component_results['testcases'].keys() | length }}",
+          'test_details_link': "[test details](./{{ _test_component }}/test.results/test-results.md)",
+          'test_collection': "{{ __test_component__collection }}",
+          'test_collection_version': "{{ __test_component__collection_version }}",
+          'test_component': "{{ _test_component }}",
+          'test_date': "{{ _test_component_results['test_date'] }}",
+          'test_failed': "{{ _test_component_results['test_failed'] }}"
+         }
+      {% endif %}
+      {% endfor %}
+
+- name: "{{ __test_component__log_save_test_summary }} Display __test_report_summary_results_flattened"
+  debug:
+    var: __test_report_summary_results_flattened
+    verbosity: 1
+
+- name: "{{ __test_component__log_save_test_summary }} Flatten results to __test_report_results_flattened"
+  no_log: true
+  set_fact:
+    __test_report_results_flattened: "{{ _test_results|from_yaml }}"
+  vars:
+    _test_results: |-
+      {% set test_item_count = [] %}
+      {% for _test_component, _test_component_results in __test_report_results.test_components.items() %}
+      {% if _test_component_results['testcases'] is mapping %}
+      {% for _test_case_id, _test_case_results in _test_component_results.testcases.items() %}
+      {% if _test_case_results is mapping %}
+      {% set __ = test_item_count.append(1) %}
+      - {
+          'test_count': "{{ test_item_count | length }}",
+          'test_details_link': "[test details](./{{ _test_component }}/test.results/test_{{ _test_case_id }}/test-results.detailed.yml)",
+          'test_collection': "{{ __test_component__collection }}",
+          'test_component': "{{ _test_component }}",
+          'test_case_id': "{{ _test_case_id }}",
+      {% for key in _test_case_results.keys() %}
+      {% if key != '__test_data' %}
+          "{{ key }}": "{{ _test_case_results[key] }}",
+      {% endif %}
+      {% endfor %}
+          }
+      {% endif %}
+      {% endfor %}
+      {% endif %}
+      {% endfor %}
+
+- name: "{{ __test_component__log_save_test_summary }} Display __test_report_results_flattened"
+  debug:
+    var: __test_report_results_flattened
+    verbosity: 1
+
+- name: "{{ __test_component__log_save_test_summary }} Initialize __test_failed"
+  set_fact:
+    __test_count: "{{ __test_report_results_flattened | length }}"
+    __test_failed: False
+    __test_failed_count: 0
+
+- name: "{{ __test_component__log_save_test_summary }} Set __test_failed"
+  when: item.test_failed|d(False)|bool
+  no_log: true
+  set_fact:
+    __test_failed: True
+    __test_failed_count: "{{ __test_failed_count|int + 1 }}"
+  loop: "{{ __test_report_results_flattened }}"
+  loop_control:
+    label: "{{ item.test_case_id }}"
+
+- name: "{{ __test_component__log_save_test_summary }} Display __test_failed"
+  debug:
+    var: __test_failed
+
+- name: "{{ __test_component__log_save_test_summary }} Display __test_count"
+  debug:
+    var: __test_count
+
+- name: "{{ __test_component__log_save_test_summary }} Display __test_failed_count"
+  debug:
+    var: __test_failed_count
+
+- name: "{{ __test_component__log_save_test_summary }} Set __test_component__info"
+  set_fact:
+    __test_results_info:
+      test_failed: "{{ __test_failed }}"
+      test_date: "{{ ansible_date_time.iso8601 }}"
+      test_count: "{{ __test_count }}"
+      test_failed_count: "{{ __test_failed_count }}"
+
+- name: "{{ __test_component__log_save_test_summary }} Display __test_report_results[1]"
+  debug:
+    var: __test_report_results
+    verbosity: 2
+
+- name: "{{ __test_component__log_save_test_summary }} Add test status to __test_report_results"
+  no_log: true
+  set_fact:
+    __test_report_results: "{{ __test_report_results|d({})
+      | combine( __test_results_info, recursive=True ) }}"
+    __test_report_results_detailed: "{{ __test_report_results_detailed|d({})
+      | combine( __test_results_info, recursive=True ) }}"
+
+- name: "{{ __test_component__log_save_test_summary }} Display __test_report_results"
+  debug:
+    var: __test_report_results
+    verbosity: 1
+
+- name: "{{ __test_component__log_save_test_summary }} Save test report results to {{ __test_component__base_dir }}/{{ __test_report_results_file }}"
+  copy:
+    content: "{{ {'test_results': __test_report_results} | to_nice_yaml(indent=2) }}"
+    dest: "{{ __test_component__test_base_dir }}/{{ __test_component__base_dir }}/{{ __test_report_results_file }}"
+
+- name: "{{ __test_component__log_save_test_summary }} Save test report detailed results to {{ __test_component__base_dir }}/{{ __test_report_results_detailed_file }}"
+  copy:
+    content: "{{ {'test_results': __test_report_results_detailed} | to_nice_yaml(indent=2) }}"
+    dest: "{{ __test_component__test_base_dir }}/{{ __test_component__base_dir }}/{{ __test_report_results_detailed_file }}"
+
+- name: "{{ __test_component__log_save_test_summary }} Save __test_report_results_flattened to {{ __test_component__base_dir }}/{{ __test_report_summary_detailed_results_csv }}"
+  ignore_errors: yes
+  dettonville.utils.export_dicts:
+    export_list: "{{ __test_report_results_flattened | dettonville.utils.sort_dict_list('test_component') }}"
+    columns: "{{ __test_component__report_columns }}"
+    file: "{{ __test_component__test_base_dir }}/{{ __test_component__base_dir }}/{{ __test_report_summary_detailed_results_csv }}"
+    format: "csv"
+
+- name: "{{ __test_component__log_save_test_summary }} Save __test_report_results_flattened to {{ __test_component__base_dir }}/{{ __test_report_summary_detailed_results_md }}"
+  ignore_errors: yes
+  dettonville.utils.export_dicts:
+    export_list: "{{ __test_report_results_flattened | dettonville.utils.sort_dict_list('test_component') }}"
+    columns: "{{ __test_component__report_columns }}"
+    file: "{{ __test_component__test_base_dir }}/{{ __test_component__base_dir }}/{{ __test_report_summary_detailed_results_md }}"
+    format: "md"
+
+- name: "{{ __test_component__log_save_test_summary }} Save __test_report_summary_results_flattened to {{ __test_component__base_dir }}/{{ __test_report_summary_results_md }}"
+  ignore_errors: yes
+  dettonville.utils.export_dicts:
+    export_list: "{{ __test_report_summary_results_flattened | dettonville.utils.sort_dict_list('test_component') }}"
+    columns: "{{ __test_component__summary_report_columns }}"
+    file: "{{ __test_component__test_base_dir }}/{{ __test_component__base_dir }}/{{ __test_report_summary_results_md }}"
+    format: "md"
+
+- name: "{{ __test_component__log_save_test_summary }} Display __test_component__git_comment"
+  debug:
+    var: __test_component__git_comment
+
+- name: "{{ __test_component__log_save_test_summary }} Git ACP update save test results"
+  when: __test_component__git_test_results_enabled|bool
+  dettonville.utils.git_pacp:
+    url: "{{ __test_component__git_repo_url }}"
+    path: "{{ __test_component__test_base_dir }}"
+    branch: "{{ __test_component__git_repo_branch }}"
+    comment: "{{ __test_component__git_comment }}"
+    ssh_params: "{{ __test_component__git_ssh_params }}"
+  register: __test_component__git_pacp_result

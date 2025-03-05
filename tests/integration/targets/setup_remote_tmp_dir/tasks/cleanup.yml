@@ -1,0 +1,5 @@
+- name: delete temporary directory
+  no_log: true
+  file:
+    path: "{{ remote_tmp_dir }}"
+    state: absent

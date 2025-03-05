@@ -1,0 +1,79 @@
+---
+
+- name: "run-role-tests | Init role test vars"
+  hosts: localhost
+  connection: local
+  gather_facts: yes
+  become: no
+  vars_files:
+    - ./../integration_config.vault.yml
+    - test-vars.yml
+  tasks:
+
+  - name: "run-role-tests | Init test vars"
+    tags: always
+    import_tasks: init-test-vars.yml
+
+- name: "run-role-tests | Perform connectivity (ping) tests to determine nodes to add to group 'node_offline'"
+  hosts: testgroup_lnx,testgroup_wnd,!node_offline
+  tags: always
+  ignore_unreachable: yes
+  gather_facts: no
+  vars_files:
+    - ./../integration_config.vault.yml
+    - test-vars.yml
+  roles:
+    - role: dettonville.utils.ping_test
+
+- name: "run-role-tests | Set common groups"
+  hosts: testgroup_lnx,testgroup_wnd,!node_offline
+  tags: always
+  become: no
+  vars_files:
+    - ./../integration_config.vault.yml
+    - test-vars.yml
+  roles:
+    - role: dettonville.utils.apply_common_groups
+
+- name: "run-role-tests | Display dettonville_network_* common vars"
+  hosts: testgroup_lnx,testgroup_wnd,!node_offline
+  become: false
+  gather_facts: true
+  tags: display-network-vars
+  vars_files:
+    - ./../integration_config.vault.yml
+    - test-vars.yml
+  tasks:
+    - name: "Display dettonville_network_* common vars"
+      debug:
+        msg:
+          - "dettonville_network_site={{ dettonville_network_site | d('') }}"
+          - "dettonville_network_location={{ dettonville_network_location | d('') }}"
+          - "dettonville_network_segment={{ dettonville_network_segment | d('') }}"
+          - "dettonville_network_subnet={{ dettonville_network_subnet | d('') }}"
+          - "dettonville_network_cidr={{ dettonville_network_cidr | d('') }}"
+
+    - name: "Display dettonville_network_config"
+      debug:
+        var: dettonville_network_config
+
+- name: "run-role-tests | Display hostvars"
+  hosts: testgroup_lnx,testgroup_wnd,!node_offline
+  become: false
+  gather_facts: true
+  tags: display-hostvars
+  vars_files:
+    - ./../integration_config.vault.yml
+    - test-vars.yml
+  tasks:
+    ## ref: https://stackoverflow.com/questions/53264221/in-ansible-how-to-filter-a-dictionary-based-on-regex-pattern-on-the-keys
+    - name: "Display host variables - excluding sensitive and/or global scope keys 
+             (e.g., `.*vault.*`, '.*private_key.*', 'groups', '.*password.*', etc)"
+      debug:
+        var: hostvars[inventory_hostname] | dict2items
+              | rejectattr('key', 'match', '.*vault.*')
+              | rejectattr('key', 'match', '.*password.*')
+              | rejectattr('key', 'match', '.*private_key.*')
+              | rejectattr('key', 'match', 'groups')
+              | rejectattr('key', 'match', '.*_global_config')
+              | list | items2dict

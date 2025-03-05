@@ -1,4 +1,7 @@
-pytest~=7.1.2
-PyYAML~=6.0
-Jinja2~=3.0.3
-setuptools~=60.10.0
+pytest
+PyYAML
+Jinja2
+setuptools
+jsonschema
+xmltodict
+logging

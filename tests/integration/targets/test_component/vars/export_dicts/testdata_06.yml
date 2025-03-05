@@ -1,0 +1,15 @@
+---
+
+test_description: "markdown test - empty key value"
+test_file_format: "md"
+
+export_list:
+  - { key1: "", key2: "value12", key3: "value13", key4: "value14" }
+  - { key1: "value21", key2: "", key3: "value23", key4: "value24" }
+  - { key1: "value31", key2: "value32", key3: "", key4: "value34" }
+  - { key1: "value41", key2: "value42", key3: "", key4: "" }
+
+test_expected:
+  changed: yes
+  failed: no
+  message: "The markdown file has been created successfully at .*/{{ __test_file }}"

@@ -1,0 +1,57 @@
+---
+
+- name: "runme | Run dettonville.utils module tests"
+  hosts: localhost
+  connection: local
+  become: no
+  vars_files:
+    - ./../integration_config.vault.yml
+    - test-vars.yml
+  tasks:
+
+  - name: "runme | Init test vars"
+    tags: always
+    import_tasks: init-test-vars.yml
+
+  - name: "runme | test dettonville.utils.git_pacp"
+    tags: git_pacp
+    import_role:
+      name: test_component
+    vars:
+      test_component: git_pacp
+      test_component__test_base_dir: "{{ __test_job__test_base_dir }}"
+      test_component__test_job_url: "{{ __test_job_url }}"
+      test_component__test_case_id_list: "{{ test_case_id_list | d([]) }}"
+#      test_component__test_run_base_dir: "{{ __test_job__test_run_base_dir }}"
+      test_component__git_ssh_private_keydir: "{{ __test_job__git_ssh_private_keydir }}"
+      test_component__git_branch: "{{ __test_git_branch }}"
+      test_component__git_commit_hash: "{{ __test_git_commit_hash }}"
+      test_component__git_commit_hash_short: "{{ __test_git_commit_hash_short }}"
+
+  - name: "runme | test dettonville.utils.sort_dict_list"
+    tags: sort_dict_list
+    import_role:
+      name: test_component
+    vars:
+      test_component: sort_dict_list
+      test_component__test_base_dir: "{{ __test_job__test_base_dir }}"
+      test_component__test_job_url: "{{ __test_job_url }}"
+      test_component__test_case_id_list: "{{ test_case_id_list | d([]) }}"
+      test_component__git_ssh_private_keydir: "{{ __test_job__git_ssh_private_keydir }}"
+      test_component__git_branch: "{{ __test_git_branch }}"
+      test_component__git_commit_hash: "{{ __test_git_commit_hash }}"
+      test_component__git_commit_hash_short: "{{ __test_git_commit_hash_short }}"
+
+  - name: "runme | test dettonville.utils.export_dicts"
+    tags: export_dicts
+    import_role:
+      name: test_component
+    vars:
+      test_component: export_dicts
+      test_component__test_base_dir: "{{ __test_job__test_base_dir }}"
+      test_component__test_job_url: "{{ __test_job_url }}"
+      test_component__test_case_id_list: "{{ test_case_id_list | d([]) }}"
+      test_component__git_ssh_private_keydir: "{{ __test_job__git_ssh_private_keydir }}"
+      test_component__git_branch: "{{ __test_git_branch }}"
+      test_component__git_commit_hash: "{{ __test_git_commit_hash }}"
+      test_component__git_commit_hash_short: "{{ __test_git_commit_hash_short }}"

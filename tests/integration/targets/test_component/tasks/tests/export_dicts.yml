@@ -1,0 +1,14 @@
+---
+
+- name: "{{ __test_component__log_run_test }} Run test on {{ __test_component__collection }}.{{ __test_component }}"
+  ignore_errors: yes
+  dettonville.utils.export_dicts:
+    file: "{{ __test_output_file_path }}"
+    format: "{{ __test_data.test_file_format | d(omit) }}"
+    columns: "{{ __test_data.columns | d(omit) }}"
+    export_list: "{{ __test_data.export_list }}"
+  register: __test_component__test_result
+
+- name: "{{ __test_component__log_run_test }} Display __test_component__test_result"
+  debug:
+    var: __test_component__test_result

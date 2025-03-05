@@ -1,0 +1,323 @@
+---
+
+- name: "{{ __test_component__log_process_test_results }} Display __test_component__fast_fail"
+  debug:
+    var: __test_component__fast_fail
+
+- name: "{{ __test_component__log_process_test_results }} Display __test_component__test_result"
+  debug:
+    var: __test_component__test_result
+    verbosity: 1
+
+- name: "{{ __test_component__log_process_test_results }} Display __test_data.test_expected"
+  debug:
+    var: __test_data.test_expected
+
+- name: "{{ __test_component__log_process_test_results }} Display __test_data"
+  debug:
+    var: __test_data
+    verbosity: 1
+
+- name: "{{ __test_component__log_process_test_results }} Assert __test_data.test_expected.changed"
+  when: __test_data.test_expected.changed is defined
+  ignore_errors: "{{ __test_component__ignore_errors|bool }}"
+  register: __test_result_validate_expected_changed
+  assert:
+    that:
+      - __test_component__test_result.changed|bool == __test_data.test_expected.changed|d(True)|bool
+
+- name: "{{ __test_component__log_process_test_results }} Display __test_result_validate_expected_changed"
+  debug:
+    var: __test_result_validate_expected_changed
+
+- name: "{{ __test_component__log_process_test_results }} Assert __test_data.test_expected.failed"
+  when: __test_data.test_expected.failed is defined
+  ignore_errors: "{{ __test_component__ignore_errors|bool }}"
+  register: __test_result_validate_expected_failed
+  assert:
+    that:
+      - __test_component__test_result.failed|d(False)|bool == __test_data.test_expected.failed|bool
+
+- name: "{{ __test_component__log_process_test_results }} Display __test_result_validate_expected_failed"
+  debug:
+    var: __test_result_validate_expected_failed
+
+- name: "{{ __test_component__log_process_test_results }} Assert __test_data.test_expected.message"
+#  when: __test_data.test_expected.message is defined
+  when: __test_data.test_expected.message|d('') != ''
+  ignore_errors: "{{ __test_component__ignore_errors|bool }}"
+  register: __test_result_validate_expected_message
+  assert:
+    that:
+      - __test_component__test_result.message|d('') | regex_search(__test_data.test_expected.message)
+#      - __test_component__test_result.message == __test_data.test_expected.message
+
+- name: "{{ __test_component__log_process_test_results }} Display __test_result_validate_expected_message"
+  debug:
+    var: __test_result_validate_expected_message
+
+- name: "{{ __test_component__log_process_test_results }} Assert __test_component__test_result.msg"
+#  when: __test_data.test_expected.msg is defined
+  when: __test_data.test_expected.msg|d('') != ''
+  ignore_errors: "{{ __test_component__ignore_errors|bool }}"
+  register: __test_result_validate_expected_msg
+  assert:
+    that:
+      - __test_component__test_result.msg | regex_search(__test_data.test_expected.msg)
+#      - __test_component__test_result.msg == __test_data.test_expected.msg
+
+- name: "{{ __test_component__log_process_test_results }} Display __test_result_validate_expected_msg"
+  debug:
+    var: __test_result_validate_expected_msg
+
+- name: "{{ __test_component__log_process_test_results }} Assert __test_data.test_expected.found"
+  when: __test_data.test_expected.found is defined
+  ignore_errors: "{{ __test_component__ignore_errors|bool }}"
+  register: __test_result_validate_expected_found
+  assert:
+    that:
+      - __test_component__test_result.found|d(False)|bool == __test_data.test_expected.found|bool
+
+- name: "{{ __test_component__log_process_test_results }} Display __test_result_validate_expected_found"
+  debug:
+    var: __test_result_validate_expected_found
+
+- name: "{{ __test_component__log_process_test_results }} Assert __test_data.test_expected.result"
+  when: __test_data.test_expected.result is defined
+  ignore_errors: "{{ __test_component__ignore_errors|bool }}"
+  register: __test_result_validate_expected_result
+  assert:
+    that:
+      - __test_component__test_result.result == __test_data.test_expected.result
+
+- name: "{{ __test_component__log_process_test_results }} Display __test_result_validate_expected_result"
+  debug:
+    var: __test_result_validate_expected_result
+
+- name: "{{ __test_component__log_process_test_results }} Assert __test_data.test_expected.results.found"
+  when: __test_data.test_expected.results.found is defined
+  loop: "{{ __test_component__test_result.results }}"
+  ignore_errors: "{{ __test_component__ignore_errors|bool }}"
+  register: __test_result_validate_expected_results_found
+  assert:
+    that:
+      - item.found == __test_data.test_expected.results.found
+
+- name: "{{ __test_component__log_process_test_results }} Display __test_result_validate_expected_results_found"
+  debug:
+    var: __test_result_validate_expected_results_found
+
+- name: "{{ __test_component__log_process_test_results }} Assert __test_data.test_expected.results.changed"
+  when: __test_data.test_expected.results.changed is defined
+  loop: "{{ __test_component__test_result.results }}"
+  ignore_errors: "{{ __test_component__ignore_errors|bool }}"
+  register: __test_result_validate_expected_results_changed
+  assert:
+    that:
+      - item.changed == __test_data.test_expected.results.changed
+
+- name: "{{ __test_component__log_process_test_results }} Display __test_result_validate_expected_results_changed"
+  debug:
+    var: __test_result_validate_expected_results_changed
+
+- name: "{{ __test_component__log_process_test_results }} Assert __test_data.test_expected.results.message"
+  when: __test_data.test_expected.results.message is defined
+  loop: "{{ __test_component__test_result.results }}"
+  ignore_errors: "{{ __test_component__ignore_errors|bool }}"
+  register: __test_result_validate_expected_results_message
+  assert:
+    that:
+      - item.message|d('') == __test_data.test_expected.results.message
+
+- name: "{{ __test_component__log_process_test_results }} Display __test_result_validate_expected_results_message"
+  debug:
+    var: __test_result_validate_expected_results_message
+
+- name: "{{ __test_component__log_process_test_results }} Evaluate results content"
+  when: not __test_data.test_expected.failed|d(False)|bool
+  block:
+
+  - name: "{{ __test_component__log_process_test_results }} Read content from expected test results at {{ __test_file_results_dir }}/{{ __test_file_expected }}"
+    no_log: true
+    slurp:
+      src: "{{ __test_component__test_base_dir }}/{{ __test_file_results_dir }}/{{ __test_file_expected }}"
+    register: test_expected_content
+
+  - name: "{{ __test_component__log_process_test_results }} Read content from post test results at {{ __test_file_results_dir }}/{{ __test_file_results }}"
+    no_log: true
+    slurp:
+      src: "{{ __test_component__test_base_dir }}/{{ __test_file_results_dir }}/{{ __test_file_results }}"
+    register: test_results_content
+
+  - name: "{{ __test_component__log_process_test_results }} Set expected and results content"
+    no_log: true
+    when: __test_file_format=='yml' or not __test_data.validate_content|d(True)|bool
+    set_fact:
+      test_expected: "{{ test_expected_content.content | b64decode | from_yaml }}"
+      test_results: "{{ test_results_content.content | b64decode | from_yaml }}"
+
+  - name: "{{ __test_component__log_process_test_results }} Set expected and results content"
+    no_log: true
+    when: __test_file_format!='yml' or __test_data.validate_content|d(True)|bool
+    set_fact:
+      test_expected: "{{ test_expected_content.content | b64decode }}"
+      test_results: "{{ test_results_content.content | b64decode }}"
+
+  - name: "{{ __test_component__log_process_test_results }} Assert test_results == test_expected"
+    register: __test_result_validate_expected_results
+    ignore_errors: "{{ __test_component__ignore_errors|bool }}"
+    assert:
+      that:
+        - test_results == test_expected
+      fail_msg: "Difference found between test_results and test_expected!"
+      quiet: true
+
+  - name: "{{ __test_component__log_process_test_results }} Handle __test_result_validate_expected_results.failed"
+    when: __test_result_validate_expected_results.failed|d(False)|bool
+    block:
+    - name: "{{ __test_component__log_process_test_results }} Display __test_result_validate_expected_results"
+      debug:
+        var: __test_result_validate_expected_results
+
+    - name: "{{ __test_component__log_process_test_results }} Display test_expected"
+      debug:
+        var: test_expected
+        verbosity: 1
+
+    - name: "{{ __test_component__log_process_test_results }} Display test_results"
+      debug:
+        var: test_results
+        verbosity: 1
+
+    - name: "{{ __test_component__log_process_test_results }} Re-emit failure"
+      when: __test_component__fast_fail|bool
+      vars:
+        failed_task:
+          result: "{{ ansible_failed_result }}"
+      fail:
+        msg: "{{ failed_task }}"
+
+#    always:
+
+- name: "{{ __test_component__log_process_test_results }} Initialize __test_case_failed"
+  set_fact:
+    __test_case_failed: False
+    __test_case_checks: []
+
+- name: "{{ __test_component__log_process_test_results }} Initialize __test_case_checks"
+  when: not (item.value.skipped|d(False)|bool)
+  no_log: true
+  set_fact:
+    __test_case_checks: "{{ __test_case_checks|d([]) + [item] }}"
+  loop:
+    - name: validate_changed
+      value: "{{ __test_result_validate_expected_changed }}"
+    - name: validate_failed
+      value: "{{ __test_result_validate_expected_failed }}"
+    - name: validate_message
+      value: "{{ __test_result_validate_expected_message }}"
+    - name: validate_msg
+      value: "{{ __test_result_validate_expected_msg }}"
+    - name: validate_found
+      value: "{{ __test_result_validate_expected_found }}"
+    - name: validate_result
+      value: "{{ __test_result_validate_expected_result }}"
+    - name: validate_results_found
+      value: "{{ __test_result_validate_expected_results_found }}"
+    - name: validate_results_changed
+      value: "{{ __test_result_validate_expected_results_changed }}"
+#        - name: validate_results_message
+#          value: "{{ __test_result_validate_expected_results_message }}"
+    - name: validate_results
+      value: "{{ __test_result_validate_expected_results }}"
+
+- name: "{{ __test_component__log_process_test_results }} Set __test_case_failed"
+  when: item.value.failed|d(False)|bool
+  no_log: true
+  set_fact:
+    __test_case_failed: True
+  loop: "{{ __test_case_checks }}"
+
+- name: "{{ __test_component__log_process_test_results }} Display __test_case_failed"
+  debug:
+    var: __test_case_failed
+
+- name: "{{ __test_component__log_process_test_results }} Set __test_case_info"
+  no_log: true
+  set_fact:
+    __test_case_info:
+      test_collection_version: "{{ __test_component__collection_version }}"
+      test_description: "{{ __test_data.test_description | d(__test_case_id) }}"
+      test_job_link: "{{ '[test job link](' + __test_component__test_job_url + ')' if (__test_component__test_job_url|d('')|length>0) else '' }}"
+      test_component_git_branch: "{{ __test_component__git_branch }}"
+      test_component_git_commit_hash: "{{ __test_component__git_commit_hash_short }}"
+      test_failed: "{{ __test_case_failed }}"
+      test_date: "{{ ansible_date_time.iso8601 }}"
+    __test_case_info_detailed:
+      test_collection_version: "{{ __test_component__collection_version }}"
+      test_description: "{{ __test_data.test_description | d(__test_case_id) }}"
+      test_job_link: "{{ '[test job link](' + __test_component__test_job_url + ')' if (__test_component__test_job_url|d('')|length>0) else '' }}"
+      test_component_git_branch: "{{ __test_component__git_branch }}"
+      test_component_git_commit_hash: "{{ __test_component__git_commit_hash }}"
+      test_failed: "{{ __test_case_failed }}"
+#      test_data: "{{ __test_data }}"
+      test_date: "{{ ansible_date_time.iso8601 }}"
+      test_component_test_result: "{{ __test_component__test_result | d({}) }}"
+      test_runtime_info: "{{ __test_runtime_info
+        | combine({'pip3_package_info': __test_component__pip3_package_info }) }}"
+
+- name: "{{ __test_component__log_process_test_results }} Initialize __test_case_results"
+  no_log: true
+  set_fact:
+    __test_case_results: "{{
+      { __test_component: { 'testcases': { __test_case_id: __test_case_info } } } }}"
+    __test_case_results_detailed: "{{
+      { __test_component: { 'testcases': { __test_case_id: __test_case_info_detailed } } } }}"
+
+- name: "{{ __test_component__log_process_test_results }} Display __test_case_results[0]"
+  debug:
+    var: __test_case_results
+
+- name: "{{ __test_component__log_process_test_results }} Set __test_case_results"
+  no_log: true
+  set_fact:
+    __test_case_results: "{{ __test_case_results
+      | combine( {
+        __test_component: {
+          'testcases': {
+            __test_case_id: {
+              item.name: {
+                'failed': item.value.failed|d(False),
+                'msg': item.value.msg|d('')
+                }
+          } } } }, recursive=True) }}"
+    __test_case_results_detailed: "{{ __test_case_results_detailed
+      | combine( {
+        __test_component: {
+          'testcases': {
+            __test_case_id: {
+              item.name: {
+                'failed': item.value.failed|d(False),
+                'msg': item.value.msg|d('')
+                }
+          } } } }, recursive=True) }}"
+  loop: "{{ __test_case_checks }}"
+  loop_control:
+    label: "{{ item.name }}"
+
+- name: "{{ __test_component__log_process_test_results }} Display __test_case_results"
+  debug:
+    var: __test_case_results
+
+- name: "{{ __test_component__log_process_test_results }} Merge test_case_results to  __test_component__report_results"
+  no_log: true
+  set_fact:
+    __test_component__report_results: "{{ __test_component__report_results|d({})
+      | combine( { 'test_components': __test_case_results }, recursive=True) }}"
+    __test_component__report_results_detailed: "{{ __test_component__report_results_detailed|d({})
+      | combine( { 'test_components': __test_case_results_detailed }, recursive=True) }}"
+
+- name: "{{ __test_component__log_process_test_results }} Display __test_component__report_results"
+  debug:
+    var: __test_component__report_results
+    verbosity: 1

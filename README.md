@@ -1,368 +1,113 @@
-# dettonville.utils
 
-`dettonville.utils` includes an Ansible module 'export_dicts' that can be used to export a list of dictionaries to a specified file in either a 'csv' or 'markdown' format.
+[![License](https://img.shields.io/badge/license-MIT-brightgreen.svg?style=flat)](LICENSE)
 
+# Dettonville Ansible Utilities Collection
 
-## Plugins
+The Ansible ``dettonville.utils`` collection includes a variety of plugins that aid in the management, manipulation and visibility of data for the Ansible playbook developer.
 
-### Filter
+<!--start requires_ansible-->
+## Ansible version compatibility
 
-* `to_ini` - Convert hash/map/dict to INI format
-* `from_ini` - Convert INI to hash/map/dict
-* `to_toml` - Convert hash/map/dict to TOML format
-* `from_toml` - Convert TOML to hash/map/dict
-* `jq` - Parse JSON using `jq`
-* `export_dicts` - Export list of dicts to file in either comma-delimited '*.csv' or markdown '*.md' format
+This collection has been tested against following Ansible versions: **>=2.9.10**.
+
+Plugins and modules within a collection may be tested with only specific Ansible versions.
+A collection may contain metadata that identifies these versions.
+PEP440 is the schema used to describe the versions of Ansible.
+<!--end requires_ansible-->
+
+## Included content
+
+<!--start collection content-->
+### Filter plugins
+Name | Description
+--- | ---
+[dettonville.utils.sort_dict_list](https://github.com/dettonville/ansible.utils/blob/main/docs/dettonville.utils.sort_dict_list.md)|Parse cli output or text using a variety of parsers
+
+### Lookup plugins
+Name | Description
+--- | ---
 
 ### Modules
+Name | Description
+--- | ---
+[dettonville.utils.git_pacp](https://github.com/dettonville/ansible.utils/blob/main/docs/dettonville.utils.git_pacp.md)|Perform git operations including: 'clone', 'pull', 'acp', and 'pacp' (pull, add, commit and push).
+[dettonville.utils.export_dicts](https://github.com/dettonville/ansible.utils/blob/main/docs/dettonville.utils.export_dicts.md)|Write a list of flat dictionaries to a file with either csv or markdown format.
 
-#### net_tools
+### Test plugins
+Name | Description
+--- | ---
 
-* `speedtest` - Tests internet bandwidth using speedtest.net
+<!--end collection content-->
 
-#### packaging
+## Installing this collection
 
-* `go` - Manage Golang packages
+You can install the ``dettonville.utils`` collection with the Ansible Galaxy CLI:
 
-#### system
+    ansible-galaxy collection install dettonville.utils
 
-* `cert_locations` - Report CA cert locations used by Ansible
+You can also include it in a `requirements.yml` file and install it with `ansible-galaxy collection install -r requirements.yml`, using the format:
 
-### Callback
-
-* `dump_stats` - Callback to dump to stats from `set_stat` to a JSON file
-* `cprofile` - Uses `cProfile` to profile the python execution of ansible
-
-
-
-
-
-
-
-## Setup test environment
-
-The collection project structure:
-
+```yaml
+---
+collections:
+  - name: dettonville.utils
 ```
-tree -A -d -L 4 .
-.
-├── collections
-│   └── ansible_collections
-│       └── dettonville
-│           └── utils
-├── docs -> collections/ansible_collections/dettonville/utils/docs
-├── plugins -> collections/ansible_collections/dettonville/utils/plugins
-├── roles -> collections/ansible_collections/dettonville/utils/roles
-└── tests -> collections/ansible_collections/dettonville/utils/tests
-
-9 directories
-```
-
-Run `ansible-test` from within `ansible_collections/dettonville/utils/`:
-
-```shell
-git clone https://github.com/dettonville/ansible-collection ansible-dettonville-collection
-cd ansible-dettonville-collection/collections/ansible_collections/dettonville/utils
-```
-
-
-Validate that the local module is available by viewing the module documentation:
-
-```shell
-ansible-doc -t module dettonville.utils.export_dicts
-> DETTONVILLE.UTILS.EXPORT_DICTS    (/Users/ljohnson/repos/ansible/ansible_collections/dettonville/utils/plugins/modules/export_dicts.py)
-
-        Write a list of flat dictionaries to a flat file using a specified format choice (csv or markdown) from a list of provided column names, headers and column list order.
-
-OPTIONS (= is mandatory):
-
-- column_list
-        List containing a list of column dictionary specifications for each column in the file. Each column element should contain a dict specifying values for the 'name' and 'header' keys. If the 'column_list'
-        is not specified, it will be derived from the keys of the first row in the export_list.
-        (Aliases: columns)[Default: []]
-        elements: dict
-        type: list
-
-= export_list
-        Specifies a list of dicts to write to flat file.
-        (Aliases: list)
-        elements: dict
-        type: list
-
-= file
-        File path where file will be written/saved.
-
-        type: path
-
-- format
-        `csv' write to csv formatted file. `md'  write to markdown formatted file.
-        (Choices: csv, md)[Default: csv]
-        type: str
-
-
-AUTHOR: Lee Johnson (@lj020326)
-
-EXAMPLES:
-
-- name: csv | Write file1.csv
-  export_dicts:
-    file: /tmp/test-exports/file1.csv
-    format: csv
-    export_list: 
-      - { key1: "value11", key2: "value12", key3: "value13", key4: "value14" }
-      - { key1: "value21", key2: "value22", key3: "value23", key4: "value24" }
-      - { key1: "value31", key2: "value32", key3: "value33", key4: "value34" }
-      - { key1: "value41", key2: "value42", key3: "value43", key4: "value44" }
-
-- name: md | Write markdown export_dicts.md
-  export_dicts:
-    file: /tmp/test-exports/export_dicts.md
-    format: md
-    export_list: 
-      - { key1: "value11", key2: "value12", key3: "value13", key4: "value14" }
-      - { key1: "value21", key2: "value22", key3: "value23", key4: "value24" }
-      - { key1: "value31", key2: "value32", key3: "value33", key4: "value34" }
-      - { key1: "value41", key2: "value42", key3: "value43", key4: "value44" }
-
-- name: csv with headers | Write file1.csv
-  export_dicts:
-    file: /tmp/test-exports/file1.csv
-    format: csv
-    columns: 
-      - { "name": "key1", "header": "Key #1" }
-      - { "name": "key2", "header": "Key #2" }
-      - { "name": "key3", "header": "Key #3" }
-      - { "name": "key4", "header": "Key #4" }
-    export_list: 
-      - { key1: "value11", key2: "value12", key3: "value13", key4: "value14" }
-      - { key1: "value21", key2: "value22", key3: "value23", key4: "value24" }
-      - { key1: "value31", key2: "value32", key3: "value33", key4: "value34" }
-      - { key1: "value41", key2: "value42", key3: "value43", key4: "value44" }
-
-- name: md with headers | Write markdown export_dicts.md
-  export_dicts:
-    file: /tmp/test-exports/export_dicts.md
-    format: md
-    columns: 
-      - { "name": "key1", "header": "Key #1" }
-      - { "name": "key2", "header": "Key #2" }
-      - { "name": "key3", "header": "Key #3" }
-      - { "name": "key4", "header": "Key #4" }
-    export_list: 
-      - { key1: "båz", key2: "value12", key3: "value13", key4: "value14" }
-      - { key1: "value21", key2: "ﬀöø", key3: "value23", key4: "value24" }
-      - { key1: "value31", key2: "value32", key3: "ḃâŗ", key4: "value34" }
-      - { key1: "value41", key2: "value42", key3: "ﬀöø", key4: "båz" }
+## Using this collection
 
+The most common use case for this collection is when you want to work with the complex data structures present in an Ansible playbook, inventory, or returned from modules. See each plugin documentation page for detailed examples for how these utilities can be used in tasks.
 
-RETURN VALUES:
-- changed
-        True if successful
 
-        returned: always
-        type: bool
+**NOTE**: For Ansible 2.9, you may not see deprecation warnings when you run your playbooks with this collection. Use this documentation to track when a module is deprecated.
 
-- failed
-        True if cyberark accounts lookup failed to find results
+### See Also:
 
-        returned: always
-        type: bool
+* [Using collections](https://docs.ansible.com/ansible/latest/user_guide/collections_using.html) in the Ansible documentation for more details.
 
-- message
-        Status message for lookup
+## Contributing to this collection
 
-        returned: always
-        sample: The markdown file has been created successfully at /foo/bar/test.md
-        type: str
+This collection is intended for plugins that are not platform or discipline specific. Simple plugin examples should be generic in nature. More complex examples can include real world platform modules to demonstrate the utility of the plugin in a playbook.
 
-```
+We welcome community contributions to this collection. If you find problems, please open an issue or create a PR against the [dettonville.utils collection repository](https://github.com/ansible-collections/dettonville.utils). See [Contributing to Ansible-maintained collections](https://docs.ansible.com/ansible/devel/community/contributing_maintained_collections.html#contributing-maintained-collections) for complete details.
 
-## Run Tests
+See the [Ansible Community Guide](https://docs.ansible.com/ansible/latest/community/index.html) for details on contributing to Ansible.
 
-```shell
-run_tests.sh > run_test.results.2022-06-16.txt
+### Developer notes
 
-```
+- 100% code coverage is the goal, although it's not always possible. Please include unit and integration tests with all PRs. PRs should not cause a decrease in code coverage.
+- Filter plugins should be 1 per file, with an included DOCUMENTATION string, or reference a lookup plugin with the same name.
+- Action, filter, and lookup plugins should use argspec validation. See [AnsibleArgSpecValidator](https://github.com/dettonville/ansible.utils/blob/main/plugins/module_utils/common/argspec_validate.py).
+- This collection should not depend on other collections for imported code
+- Use of the latest version of black is required for formatting (black -l79)
+- The README contains a table of plugins. Use the [collection_prep](https://github.com/ansible-network/collection_prep) utilities to maintain this.
 
 
+### Code of Conduct
+This collection follows the Ansible project's
+[Code of Conduct](https://docs.ansible.com/ansible/devel/community/code_of_conduct.html).
+Please read and familiarize yourself with this document.
 
-## Local Library Install Method
 
-To use/develop the 'export_dicts' module locally, you can copy `ansible_collections/dettonville/utils/plugins/modules/export_dicts.py` into a `library` directory in the root of your Ansible project:
+## Release notes
+<!--Add a link to a changelog.md file or an external docsite to cover this information. -->
+Release notes are available [here](https://github.com/dettonville/ansible.utils/blob/main/changelogs/CHANGELOG.rst)
+For automated release announcements refer [here](https://twitter.com/AnsibleContent).
 
-```
-myproject/
-├── ansible.cfg
-├── inv/
-├── library/
-│   ├── export_dicts.py
-├── playbooks/
-├── roles/
-├── tests/
-```
 
-Make sure to include the local 'library' path in the project ansible.cfg:
+## Roadmap
+For information on releasing, versioning and deprecation see the [stratergy document](https://access.redhat.com/articles/4993781).
 
-```ini
-## custom library paths
-## ref: https://stackoverflow.com/questions/53750049/location-to-keep-ansible-custom-modules
-;library = ./library
-library = ~/.ansible/plugins/modules:/usr/share/ansible/plugins/modules:./library
-```
+In general, major versions can contain breaking changes, while minor versions only contain new features (like new plugin addition) and bugfixes.
+The releases will be done on an as-needed basis when new features and/or bugfixes are done.
 
-Validate that the local module is available by viewing the module documentation:
+<!-- Optional. Include the roadmap for this collection, and the proposed release/versioning strategy so users can anticipate the upgrade/update cycle. -->
 
-```shell
-$ ansible-doc -t module export_dicts
+## More information
 
-> EXPORT_DICTS    (/Users/ljohnson/repos/ansible/ansible-datacenter/library/export_dicts.py)
+- [Ansible Collection overview](https://github.com/ansible-collections/overview)
+- [Ansible User guide](https://docs.ansible.com/ansible/latest/user_guide/index.html)
+- [Ansible Developer guide](https://docs.ansible.com/ansible/latest/dev_guide/index.html)
+- [Ansible Community code of conduct](https://docs.ansible.com/ansible/latest/community/code_of_conduct.html)
 
-        Write a list of flat dictionaries to a flat file using a
-        specified format choice (csv or markdown) from a list of
-        provided column names, headers and column list order.
-  ...
-
-RETURN VALUES:
-- output
-        A message describing the task result.
-
-        returned: always
-        sample: The markdown file has been created successfully at
-        /foo/bar/test.md
-        type: str
-
-```
-
-Local test custom module using python:
-```shell
-python -m library.export_dicts tests/modules/export_dicts.test1.args.json
-
-{"changed": true, "original_message": "hello", "message": "goodbye", "invocation": {"module_args": {"name": "hello", "new": true}}}
-
-```
-
-Test using ansible:
-```shell
-$ ansible localhost -m test_module -a name=foo
-
-PLAY [Ansible Ad-Hoc] *********************************************************************************************************************************************************************************************************************************************************
-
-TASK [test_module] ************************************************************************************************************************************************************************************************************************************************************
-ok: [localhost]
-
-PLAY RECAP ********************************************************************************************************************************************************************************************************************************************************************
-localhost                  : ok=1    changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0   
-
-```
-
-
-
-
-### Ansible Galaxy Install (for Ansible version > 2.9)
-
-All info related to Ansible Galax install are available [here](ansible_collections/lvrfrc87/dettonville.utils/README.md)
-
-### Module Documentation:
-
-```
-module: export_dicts
-author:
-    - "Lee Johnson (@lj020326)"
-short_description: Write a list of flat dictionaries (a dictionary mapping fieldnames to strings or numbers) to a file with either csv or markdown format. 
-description:
-    - Write a list of flat dictionaries to a flat file using a specified format choice (csv or markdown) from a list of provided column names, headers and column list order.
-options:
-    file:
-        required: true
-        type: path
-        description:
-            - File path where file will be written/saved.
-    format:
-        description:
-          - C(csv) write to csv formatted file.
-            C(md)  write to markdown formatted file.
-        required: false
-        type: str
-        choices: [ csv, md ]
-        default: "csv"
-    export_list:
-        aliases: ['list']
-        required: true
-        type: list
-        elements: dict
-        description:
-            - Specifies a list of dicts to write to flat file.
-    column_list:
-        aliases: ['columns']
-        description:
-            - List containing a list of column dictionary specifications for each column in the file.  
-              Each column element should contain a dict specifying values for the 'name' and 'header' keys.
-              If the 'column_list' is not specified, it will be derived from the keys of the first row in the export_list. 
-        required: false
-        default: []
-        type: list
-        elements: dict
-
-```
-
-### Examples:
-
-```
-- name: csv | Write file1.csv
-  export_dicts:
-    file: /tmp/test-exports/file1.csv
-    format: csv
-    export_list: 
-      - { key1: "value11", key2: "value12", key3: "value13", key4: "value14" }
-      - { key1: "value21", key2: "value22", key3: "value23", key4: "value24" }
-      - { key1: "value31", key2: "value32", key3: "value33", key4: "value34" }
-      - { key1: "value41", key2: "value42", key3: "value43", key4: "value44" }
-
-- name: md | Write markdown export_dicts.md
-  export_dicts:
-    file: /tmp/test-exports/export_dicts.md
-    format: md
-    export_list: 
-      - { key1: "value11", key2: "value12", key3: "value13", key4: "value14" }
-      - { key1: "value21", key2: "value22", key3: "value23", key4: "value24" }
-      - { key1: "value31", key2: "value32", key3: "value33", key4: "value34" }
-      - { key1: "value41", key2: "value42", key3: "value43", key4: "value44" }
-
-- name: csv with headers | Write file1.csv
-  export_dicts:
-    file: /tmp/test-exports/file1.csv
-    format: csv
-    columns: 
-      - { "name": "key1", "header": "Key #1" }
-      - { "name": "key2", "header": "Key #2" }
-      - { "name": "key3", "header": "Key #3" }
-      - { "name": "key4", "header": "Key #4" }
-    export_list: 
-      - { key1: "value11", key2: "value12", key3: "value13", key4: "value14" }
-      - { key1: "value21", key2: "value22", key3: "value23", key4: "value24" }
-      - { key1: "value31", key2: "value32", key3: "value33", key4: "value34" }
-      - { key1: "value41", key2: "value42", key3: "value43", key4: "value44" }
-
-- name: md with headers | Write markdown export_dicts.md
-  export_dicts:
-    file: /tmp/test-exports/export_dicts.md
-    format: md
-    columns: 
-      - { "name": "key1", "header": "Key #1" }
-      - { "name": "key2", "header": "Key #2" }
-      - { "name": "key3", "header": "Key #3" }
-      - { "name": "key4", "header": "Key #4" }
-    export_list: 
-      - { key1: "båz", key2: "value12", key3: "value13", key4: "value14" }
-      - { key1: "value21", key2: "ﬀöø", key3: "value23", key4: "value24" }
-      - { key1: "value31", key2: "value32", key3: "ḃâŗ", key4: "value34" }
-      - { key1: "value41", key2: "value42", key3: "ﬀöø", key4: "båz" }
-
-```
+## Licensing
 
-
-
-
-
-
-
+Apache License Version 2.0.

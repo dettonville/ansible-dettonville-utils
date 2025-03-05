@@ -1,0 +1,14 @@
+---
+
+test_description: "dict object - empty object remove test"
+
+test_expected:
+  changed: no
+  failed: no
+
+key_patterns:
+  - platform_id
+  - address
+  - username
+
+test_object: {}

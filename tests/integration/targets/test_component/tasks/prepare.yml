@@ -1,0 +1,131 @@
+---
+
+- name: "{{ __test_component__log_pretest }} Install package requirements defined in __test_component__package_requirements"
+  when:
+    - __test_component__package_requirements|d([])|length>0
+    - ansible_os_family|d('')|lower in ['debian', 'redhat']
+#    - hostvars['localhost'].ansible_os_family|d('')|lower in ['debian', 'redhat']
+  delegate_to: localhost
+  ignore_errors: yes
+  block:
+  - name: "{{ __test_component__log_pretest }} Install python3-dnf"
+    when: ansible_pkg_mgr=='dnf'
+    become: yes
+    ignore_errors: yes
+    package:
+      name: python3-dnf
+      state: present
+
+  - name: "{{ __test_component__log_pretest }} Install package requirements defined in __test_component__package_requirements"
+    become: yes
+    package:
+      name: "{{ __test_component__package_requirements }}"
+      state: present
+
+- name: "{{ __test_component__log_pretest }} Install python requirements defined in __test_component__pip_lib_requirements"
+  when: __test_component__pip_lib_requirements|d([])|length>0
+  delegate_to: localhost
+#  become: yes
+  vars:
+    ansible_python_interpreter: /usr/bin/env python3
+    #ansible_python_interpreter: "/usr/bin/python3"
+  pip:
+    name: "{{ __test_component__pip_lib_requirements }}"
+    state: present
+
+- name: "{{ __test_component__log_pretest }} Assert primary variables set"
+  assert:
+    that:
+      - __test_component is defined
+
+#- name: "{{ __test_component__log_pretest }} Setup temp dir"
+#  import_role:
+#    name: setup_remote_tmp_dir
+
+- name: "{{ __test_component__log_pretest }} Load test_component dependent variables"
+  when: (role_path + '/vars/' + __test_component + '/common.yml') is file
+  include_vars:
+    file: "{{ __test_component }}/common.yml"
+    name: __test_component__vars
+
+- name: "{{ __test_component__log_pretest }} Display __test_component__vars"
+  debug:
+    var: __test_component__vars
+
+- name: "{{ __test_component__log_pretest }} Display test directory/file info"
+  debug:
+#    verbosity: 1
+    msg:
+      - "__test_component__base_dir={{ __test_component__base_dir }}"
+      - "__test_component__test_base_dir={{ __test_component__test_base_dir }}"
+#      - "__test_component__test_run_base_dir={{ __test_component__test_run_base_dir }}"
+      - "__test_component__run_dir={{ __test_component__run_dir }}"
+      - "__test_component__component_dir={{ __test_component__component_dir }}"
+      - "__test_component__git_test_results_enabled={{ __test_component__git_test_results_enabled }}"
+      - "__test_component__git_ssh_private_keydir={{ __test_component__git_ssh_private_keydir }}"
+      - "__test_component__git_repo_url={{ __test_component__git_repo_url }}"
+      - "__test_file_start_dir={{ __test_file_start_dir }}"
+      - "__test_file_results_base_dir={{ __test_file_results_base_dir }}"
+
+- name: "{{ __test_component__log_pretest }} Display common test environment info"
+  debug:
+    verbosity: 1
+    msg:
+      - "__test_component__disable_reset_env={{ __test_component__disable_reset_env }}"
+      - "__test_component__disable_cleanup={{ __test_component__disable_cleanup }}"
+
+- name: "{{ __test_component__log_pretest }} Init __test_component__report_results"
+  set_fact:
+    __test_component__report_results: {}
+
+- name: "{{ __test_component__log_pretest }} Set __test_component__run_count"
+  set_fact:
+#    __test_component__run_count: "{{ __test_component__run_count_by_component[__test_component]|d(0)| int + 1 }}"
+    __test_component__run_count: "{{ hostvars.localhost.__test_component__run_count_by_component_global[__test_component]|d(0)| int + 1 }}"
+
+- name: "{{ __test_component__log_pretest }} Display __test_component__run_count"
+  debug:
+    var: __test_component__run_count
+
+- name: "{{ __test_component__log_pretest }} Set __test_component__run_count_by_component"
+  set_fact:
+    __test_component__run_count_by_component: "{{ __test_component__run_count_by_component|d({})
+      | combine( { __test_component: __test_component__run_count} ) }}"
+
+- name: "{{ __test_component__log_pretest }} Display __test_component__run_count_by_component"
+  debug:
+    var: __test_component__run_count_by_component
+
+- name: "{{ __test_component__log_pretest }} Set __test_component__run_count_by_component_global"
+  set_fact:
+    __test_component__run_count_by_component_global: "{{ __test_component__run_count_by_component }}"
+
+- name: "{{ __test_component__log_pretest }} Display __test_component__git_reset_component_dir"
+  debug:
+    var: __test_component__git_reset_component_dir
+
+- name: "{{ __test_component__log_pretest }} Setup test env"
+  include_tasks: setup-test-env.yml
+
+- name: "{{ __test_component__log_pretest }} Get installed python module/package list from default pip"
+  no_log: true
+  delegate_to: localhost
+  community.general.pip_package_info:
+    clients: ['pip3']
+  register: __test_component__pip_package_info
+
+- name: "{{ __test_component__log_pretest }} Display __test_component__pip_package_info"
+  debug:
+    var: __test_component__pip_package_info
+    verbosity: 1
+
+- name: "{{ __test_component__log_pretest }} Set __test_component__pip3_package_info"
+  no_log: true
+  set_fact:
+    __test_component__pip3_package_info: "{{ __test_component__pip_package_info.packages['pip3']
+      | dict2items | map(attribute='value') | flatten }}"
+
+- name: "{{ __test_component__log_pretest }} Display __test_component__pip3_package_info"
+  debug:
+    var: __test_component__pip3_package_info
+    verbosity: 2

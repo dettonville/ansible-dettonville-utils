@@ -1,0 +1,9 @@
+---
+
+- name: "Test export_dicts"
+  hosts: localhost
+  connection: local
+  become: no
+  vars_files: ./../integration_config.vault.yml
+  roles:
+    - role: export_dicts
