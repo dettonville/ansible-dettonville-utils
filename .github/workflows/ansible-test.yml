@@ -20,13 +20,8 @@ on:
 
 jobs:
 
-###
-# Sanity tests (REQUIRED)
-#
-# https://docs.ansible.com/ansible/latest/dev_guide/testing_sanity.html
-
   sanity:
-    name: Sanity tests
+    name: Perform integration testing
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
@@ -34,16 +29,46 @@ jobs:
         # Ansible Support Matrix
         # https://docs.ansible.com/ansible/latest/reference_appendices/release_and_maintenance.html#ansible-core-support-matrix
         ansible:
-          - stable-2.14
-          - stable-2.15
           - stable-2.16
           - devel
         python:
           - 3.11
         os:
-          - ubuntu-22.04
+#          - ubuntu-22.04
+          - ubuntu-latest
     steps:
-      - name: Sanity testing
+      - name: Perform integration testing with (${{ matrix.ansible }}+py${{ matrix.python }})
+        uses: ansible-community/ansible-test-gh-action@release/v1
+        with:
+          ansible-core-version: ${{ matrix.ansible }}
+          target-python-version: ${{ matrix.python }}
+          controller-python-version: auto
+          testing-type: integration
+          test-deps: >-
+            ansible.netcommon
+            ansible.utils
+
+  ###
+  # Sanity tests (REQUIRED)
+  #
+  # https://docs.ansible.com/ansible/latest/dev_guide/testing_sanity.html
+  sanity:
+    name: Perform sanity testing
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        # Ansible Support Matrix
+        # https://docs.ansible.com/ansible/latest/reference_appendices/release_and_maintenance.html#ansible-core-support-matrix
+        ansible:
+          - stable-2.16
+          - devel
+        python:
+          - 3.11
+        os:
+          - ubuntu-latest
+    steps:
+      - name: Perform sanity testing with (${{ matrix.ansible }}+py${{ matrix.python }})
         uses: ansible-community/ansible-test-gh-action@release/v1
         with:
           ansible-core-version: ${{ matrix.ansible }}
@@ -51,6 +76,7 @@ jobs:
           testing-type: sanity
           test-deps: >-
             ansible.netcommon
+            ansible.utils
 
 ###
 # Unit tests (OPTIONAL)
@@ -58,7 +84,7 @@ jobs:
 # https://docs.ansible.com/ansible/latest/dev_guide/testing_units.html
 
   units:
-    name: Unit tests (${{ matrix.ansible }}+py${{ matrix.python }})
+    name: Perform unit testing
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
@@ -66,39 +92,17 @@ jobs:
         # Ansible Support matrix
         # https://docs.ansible.com/ansible/latest/reference_appendices/release_and_maintenance.html#ansible-core-support-matrix
         ansible:
-          - stable-2.14
-          - stable-2.15
           - stable-2.16
           - devel
         python:
-          # - "2.7" no support for old Python
-          - "3.5"
-          - "3.6"
-          - "3.7"
-          - "3.8"
-          - "3.9"
           - "3.10"
           - "3.11"
           - "3.12"
         os:
-          - ubuntu-22.04
-        exclude:
-          # no support 
-          - ansible: stable-2.14
-            python: "3.12"
-          - ansible: stable-2.15
-            python: "3.12"
-          - ansible: stable-2.16
-            python: "3.5"
-          - ansible: devel
-            python: "3.5"
-          - ansible: devel
-            python: "3.6"
-          - ansible: devel
-            python: "3.7"
+          - ubuntu-latest
 
     steps:
-      - name: Unit testing
+      - name: Perform unit testing with (${{ matrix.ansible }}+py${{ matrix.python }})
         uses: ansible-community/ansible-test-gh-action@release/v1
         with:
           ansible-core-version: ${{ matrix.ansible }}
