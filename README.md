@@ -107,7 +107,3 @@ The releases will be done on an as-needed basis when new features and/or bugfixe
 - [Ansible User guide](https://docs.ansible.com/ansible/latest/user_guide/index.html)
 - [Ansible Developer guide](https://docs.ansible.com/ansible/latest/dev_guide/index.html)
 - [Ansible Community code of conduct](https://docs.ansible.com/ansible/latest/community/code_of_conduct.html)
-
-## Licensing
-
-Apache License Version 2.0.
