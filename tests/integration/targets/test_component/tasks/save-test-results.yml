@@ -10,30 +10,38 @@
     ssh_params: "{{ __test_component__git_ssh_params }}"
   register: __test_component__git_pull_result
 
-- name: "{{ __test_component__log_save_test_results }} Reset test results dir {{ __test_file_results_dir }}"
-  file:
-    path: "{{ __test_component__test_base_dir }}/{{ __test_file_results_dir }}"
+- name: "{{ __test_component__log_save_test_results }} Reset test results dir {{ 
+    __test_component__test_file_results_dir }}"
+  ansible.builtin.file:
+    path: "{{ __test_component__test_base_dir }}/{{ __test_component__test_file_results_dir }}"
     state: absent
 
-- name: "{{ __test_component__log_save_test_results }} Ensure {{ __test_file_results_dir }} exists"
-  file:
-    path: "{{ __test_component__test_base_dir }}/{{ __test_file_results_dir }}"
+- name: "{{ __test_component__log_save_test_results }} Ensure {{ __test_component__test_file_results_dir }} exists"
+  ansible.builtin.file:
+    path: "{{ __test_component__test_base_dir }}/{{ __test_component__test_file_results_dir }}"
     state: directory
+    mode: "0755"
 
-- name: "{{ __test_component__log_save_test_results }} Save test case test data to {{ __test_file_results_dir }}/{{ __test_file_test_data }}"
-  copy:
+- name: "{{ __test_component__log_save_test_results }} Save test case test data to {{ 
+    __test_component__test_file_results_dir }}/{{ __test_component__test_file_test_data }}"
+  ansible.builtin.copy:
     content: "{{ {'test_data': __test_data} | to_nice_yaml(indent=2) }}"
-    dest: "{{ __test_component__test_base_dir }}/{{ __test_file_results_dir }}/{{ __test_file_test_data }}"
+    dest: "{{ __test_component__test_base_dir }}/{{ 
+      __test_component__test_file_results_dir }}/{{ __test_component__test_file_test_data }}"
+    mode: "0644"
 
-- name: "{{ __test_component__log_reset }} Display __test_file_results_dir"
-  debug:
-    var: __test_file_results_dir
+- name: "{{ __test_component__log_reset }} Display __test_component__test_file_results_dir"
+  ansible.builtin.debug:
+    var: __test_component__test_file_results_dir
 
-#- name: "{{ __test_component__log_save_test_results }} Save post test results to {{ __test_file_results_dir }}/{{ __test_file_results }}"
+#- name: "{{ __test_component__log_save_test_results }} Save post test results to {{
+#    __test_component__test_file_results_dir }}/{{ __test_component__test_file_results }}"
 #  when: __test_component__vars.test_result_output_file|d(False)|bool
-#  copy:
-#    src: "{{ __test_component__test_base_dir }}/{{ __test_file_path }}"
-#    dest: "{{ __test_component__test_base_dir }}/{{ __test_file_results_dir }}/{{ __test_file_results }}"
+#  ansible.builtin.copy:
+#    src: "{{ __test_component__test_base_dir }}/{{ __test_component__test_file_path }}"
+#    dest: "{{ __test_component__test_base_dir }}/{{
+#      __test_component__test_file_results_dir }}/{{ __test_component__test_file_results }}"
+#    mode: "0644"
 #  no_log: true
 
 - name: "{{ __test_component__log_save_test_results }} Save test results data from slurped results"
@@ -42,146 +50,187 @@
     - not __test_data.test_expected.failed|d(False)
   block:
 
-  - name: "{{ __test_component__log_run_test }} Init __test_data_test_files_expected_state"
-    set_fact:
-      __test_data_test_files_expected_state: {}
+    - name: "{{ __test_component__log_save_test_results }} Set __test_run_path"
+      ansible.builtin.set_fact:
+        __test_run_path: "{{__test_component__test_base_dir }}/{{ __test_dir }}/"
 
-  - name: "{{ __test_component__log_run_test }} Merge __test_data.test_start_data start to __test_data_test_files_expected_state"
-    set_fact:
-      __test_data_test_files_expected_state: "{{ __test_data_test_files_expected_state|d({})
-        | combine({ item.file_path: item }) }}"
-    loop: "{{ __test_data.test_start_data|d([]) }}"
+    - name: "{{ __test_component__log_save_test_results }} Find test results data"
+      no_log: true
+      ansible.builtin.find:
+        paths: "{{ __test_run_path }}"
+        file_type: file
+        patterns: '.*'
+        recurse: yes
+        follow: yes
+        use_regex: true
+      register: __test_component__test_results_files
 
-  - name: "{{ __test_component__log_run_test }} Merge __test_data.test_files to __test_data_test_files_expected_state"
-    set_fact:
-      __test_data_test_files_expected_state: "{{ __test_data_test_files_expected_state|d({})
-        | combine({ item.file_path: item }) }}"
-    loop: "{{ __test_data.test_files|d([]) }}"
+    - name: "{{ __test_component__log_save_test_results }} Set __test_component__test_results_file_paths"
+      no_log: true
+      ansible.builtin.set_fact:
+        __test_component__test_results_file_paths: "{{ 
+          __test_component__test_results_files.files | map(attribute='path') | list | sort }}"
 
-  - name: "{{ __test_component__log_run_test }} Display __test_data_test_files_expected_state"
-    debug:
-      var: __test_data_test_files_expected_state
+    - name: "{{ __test_component__log_save_test_results }} Display __test_component__test_results_file_paths"
+      ansible.builtin.debug:
+        var: __test_component__test_results_file_paths
 
-  - name: "{{ __test_component__log_run_test }} Merge __test_data.test_files to __test_data_test_files_expected_state"
-    set_fact:
-      __test_data_test_files_expected_content: "{{ _test_results|from_yaml }}"
-    vars:
-      _test_results: |-
-        {% set _test_files_expected_content = {} %}
-        {% for _test_file_key in __test_data_test_files_expected_state.keys() | sort %}
-        {% set _test_file = __test_data_test_files_expected_state[_test_file_key] %}
-        {% if _test_file.state | d('present') == 'present' %}
-        {% set __ = _test_files_expected_content.update({ _test_file_key: _test_file.content }) %}
-        {% endif %}
-        {% endfor %}
-        {{ _test_files_expected_content }}
+    - name: "{{ __test_component__log_save_test_results }} Slurp result file contents"
+      no_log: true
+      ansible.builtin.slurp:
+        src: '{{ item }}'
+      register: __test_component__test_results_file_contents
+      loop: "{{ __test_component__test_results_file_paths }}"
 
-  - name: "{{ __test_component__log_run_test }} Display __test_data_test_files_expected_content"
-    debug:
-      var: __test_data_test_files_expected_content
+    - name: "{{ __test_component__log_save_test_results }} Display __test_component__test_results_file_contents.results|d([])"
+      ansible.builtin.debug:
+        var: __test_component__test_results_file_contents.results|d([])
+        verbosity: 1
 
-  - name: "{{ __test_component__log_save_test_results }} Save expected slurped test results to {{ __test_file_results_dir }}/{{ __test_file_expected }}"
-    when: not __test_data.test_expected.failed|d(False)|bool
-#    no_log: true
-    template:
-      src: "{{ item }}"
-      dest: "{{ __test_component__test_base_dir }}/{{ __test_file_results_dir }}/{{ __test_file_expected }}"
-    with_first_found:
-    - skip: true
-      files:
-      - "{{ __test_component }}/test_{{ __test_case_id }}.{{ __test_file_expected }}.j2"
-      - "{{ __test_component }}/test.{{ __test_file_expected }}.j2"
-      - "test.{{ __test_file_expected }}.j2"
+    - name: "{{ __test_component__log_save_test_results }} Init __test_component__test_results_file_contents_by_path"
+      no_log: true
+      ansible.builtin.set_fact:
+        __test_component__test_results_file_contents_by_path: {}
 
-  - name: "{{ __test_component__log_save_test_results }} Find test results data"
-    find:
-      paths: "{{ __test_component__test_base_dir }}/{{ __test_dir }}"
-      file_type: "file"
-      patterns: '.*'
-      recurse: yes
-      follow: yes
-      use_regex: true
-    register: __test_component__test_results_files
+    - name: "{{ __test_component__log_save_test_results }} Set __test_component__test_results_file_contents_by_path"
+      no_log: true
+      ansible.builtin.set_fact:
+        __test_component__test_results_file_contents_by_path: "{{ 
+          __test_component__test_results_file_contents_by_path|d({}) 
+          | combine({ (item.source|replace(__test_run_path, '')): item }) }}"
+      loop: "{{ __test_component__test_results_file_contents.results | d([]) }}"
 
-  - name: "{{ __test_component__log_save_test_results }} Set __test_component__test_results_file_paths"
-    set_fact:
-      __test_component__test_results_file_paths: "{{ __test_component__test_results_files.files | map(attribute='path') | list | sort }}"
+    - name: "{{ __test_component__log_save_test_results }} Display __test_component__test_results_file_contents_by_path"
+      ansible.builtin.debug:
+        var: __test_component__test_results_file_contents_by_path
+  #      verbosity: 1
 
-  - name: "{{ __test_component__log_save_test_results }} Display __test_component__test_results_file_paths"
-    debug:
-      var: __test_component__test_results_file_paths
+    - name: "{{ __test_component__log_save_test_results }} Find test result links"
+      no_log: true
+      ansible.builtin.find:
+        paths: "{{ __test_run_path }}"
+        file_type: link
+        patterns: '.*\.yml'
+        recurse: yes
+        follow: yes
+        use_regex: true
+      register: __test_component__test_result_links
 
-  - name: "{{ __test_component__log_save_test_results }} Slurp result file contents"
-    no_log: true
-    slurp:
-      src: '{{ item }}'
-    register: __test_component__test_results_file_contents
-    loop: "{{ __test_component__test_results_file_paths }}"
+    - name: "{{ __test_component__log_save_test_results }} Display __test_component__test_result_links"
+      ansible.builtin.debug:
+        var: __test_component__test_result_links.files|d([])
+        verbosity: 2
 
-  - name: "{{ __test_component__log_save_test_results }} Set __test_run_path"
-    set_fact:
-      __test_run_path: "{{__test_component__test_base_dir }}/{{ __test_dir }}/"
+    - name: "{{ __test_component__log_save_test_results }} Set __test_run_path_regex"
+      ansible.builtin.set_fact:
+        __test_run_path_regex: "^{{ __test_run_path }}"
 
-  - name: "{{ __test_component__log_save_test_results }} Initialize __test_component__test_results_file_results"
-    no_log: true
-    set_fact:
-      __test_component__test_results_file_results: {}
+    - name: "{{ __test_component__log_save_test_results }} Init __test_component__test_results_link_paths"
+      no_log: true
+      ansible.builtin.set_fact:
+        __test_component__test_results_link_paths: {}
 
-  - name: "{{ __test_component__log_save_test_results }} Set __test_component__test_results_file_results"
-    when: __test_file_format=='yml'
-    no_log: true
-    set_fact:
-      __test_component__test_results_file_results: "{{
-        __test_component__test_results_file_results|d({})
-          | combine( { (item.source|replace(__test_run_path, '')): (item.content | b64decode | from_yaml) })
-        }}"
-    loop: '{{ __test_component__test_results_file_contents.results }}'
+    - name: "{{ __test_component__log_save_test_results }} Set __test_component__test_results_link_paths"
+      no_log: true
+      ansible.builtin.set_fact:
+        __test_component__test_results_link_paths: "{{ 
+          __test_component__test_result_links.files | d([]) | map(attribute='path') | list 
+          | map('regex_replace', __test_run_path_regex, '') | list | sort | list }}"
 
-  - name: "{{ __test_component__log_save_test_results }} Set __test_component__test_results_file_results"
-    when: __test_file_format!='yml'
-    no_log: true
-    set_fact:
-      __test_component__test_results_file_results: "{{
-        __test_component__test_results_file_results|d({})
-          | combine( { (item.source|replace(__test_run_path, '')): (item.content | b64decode) })
-        }}"
-    loop: '{{ __test_component__test_results_file_contents.results }}'
+    - name: "{{ __test_component__log_save_test_results }} Display __test_component__test_results_link_paths"
+      ansible.builtin.debug:
+        var: __test_component__test_results_link_paths
 
-  - name: "{{ __test_component__log_save_test_results }} Display __test_component__test_results_file_results"
-    debug:
-      var: __test_component__test_results_file_results
-      verbosity: 1
+    - name: "{{ __test_component__log_save_test_results }} Display __test_data.validate_yaml_content"
+      ansible.builtin.debug:
+        var: __test_data.validate_yaml_content|d(True)
 
-  - name: "{{ __test_component__log_save_test_results }} Save slurped post test results to {{ __test_file_results_dir }}/{{ __test_file_results }}"
-    no_log: true
-    copy:
-      content: "{{ __test_component__test_results_file_results | to_nice_yaml(indent=2) }}"
-      dest: "{{ __test_component__test_base_dir }}/{{ __test_file_results_dir }}/{{ __test_file_results }}"
+    - name: "{{ __test_component__log_save_test_results }} Save actual test results to {{ 
+        __test_component__test_file_results_dir }}/{{ __test_component__test_file_results }}"
+      ansible.builtin.template:
+        src: "test_actual_results.yml.j2"
+        dest: "{{ __test_component__test_base_dir }}/{{ 
+          __test_component__test_file_results_dir }}/{{ __test_component__test_file_results }}"
+        mode: "0644"
 
-- name: "{{ __test_component__log_save_test_results }} Save expected test results to {{ __test_file_results_dir }}/{{ __test_file_expected }}"
+- name: "{{ __test_component__log_save_test_results }} Set expected results template vars"
+  ansible.builtin.set_fact:
+#    __expected_results_template: "{{
+#      __test_component__test_case_dir }}/test_{{ __test_case_id }}.{{ __test_component__test_file_expected }}.j2"
+    __expected_results_template: "{{ __test_component__test_case_dir }}/test_{{ __test_case_id }}.{{
+      __test_component__test_file_testresult_prefix }}.expected.yml.j2"
+    __test_component__use_case_run_file: "test_use_case_run.{{ __test_component__type }}.md.j2"
+    __test_component__use_case_results_file: "test_use_case_results.{{ __test_component__type }}.md.j2"
+    __expected_results_file: "{{ __test_data.test_results_file | d(__test_component__test_file) }}"
+    __expected_results_dir: "{{ __test_data.test_results_dir | d(__test_component__results_dir) }}"
+
+- name: "{{ __test_component__log_save_test_results }} Display __test_data.expected_links"
+  ansible.builtin.debug:
+    var: __test_data.expected_links|d([])
+
+- name: "{{ __test_component__log_save_test_results }} Display expected results template vars"
+  ansible.builtin.debug:
+    msg:
+      - "__test_data.validate_yaml_content: {{ __test_data.validate_yaml_content | d(True) }}"
+      - "__expected_results_template: {{ __expected_results_template }}"
+      - "__expected_results_file: {{ __expected_results_file }}"
+      - "__expected_results_dir: {{ __expected_results_dir }}"
+
+- name: "{{ __test_component__log_save_test_results }} Display __test_data.test_start_data|d([])"
+  ansible.builtin.debug:
+    var: __test_data.test_start_data|d([])
+
+- name: "{{ __test_component__log_save_test_results }} Save expected test results to {{ 
+    __test_component__test_file_results_dir }}/{{ __test_component__test_file_expected }}"
+  when:
+    - __test_component__vars.test_result_output_file_slurp|d(False)|bool
+    - not __test_data.test_expected.failed|d(False)|bool
+  #  no_log: true
+  ansible.builtin.template:
+    src: "test_expected_results.yml.j2"
+    dest: "{{ __test_component__test_base_dir }}/{{ 
+      __test_component__test_file_results_dir }}/{{ __test_component__test_file_expected }}"
+    mode: "0644"
+
+- name: "{{ __test_component__log_save_test_results }} Save use case example to {{ 
+    __test_component__test_file_results_dir }}/{{ __test_component__use_case_example_file }}"
+  ansible.builtin.template:
+    src: "test_use_case_example.md.j2"
+    dest: "{{ __test_component__test_base_dir }}/{{ 
+      __test_component__test_file_results_dir }}/{{ __test_component__use_case_example_file }}"
+    mode: "0644"
+
+- name: "{{ __test_component__log_save_test_results }} Save expected test results to {{ 
+    __test_component__test_file_results_dir }}/{{ __test_component__test_file_expected }}"
   when:
     - not __test_component__vars.test_result_output_file_slurp|d(False)|bool
     - not __test_data.test_expected.failed|d(False)|bool
 #  no_log: true
-  copy:
-    src: "{{ __test_component }}/test_{{ __test_case_id }}.{{ __test_file_expected }}"
-    dest: "{{ __test_component__test_base_dir }}/{{ __test_file_results_dir }}/{{ __test_file_expected }}"
+  ansible.builtin.copy:
+    src: "{{ __test_component }}/test_{{ __test_case_id }}.{{ __test_component__test_file_expected }}"
+    dest: "{{ __test_component__test_base_dir }}/{{ 
+      __test_component__test_file_results_dir }}/{{ __test_component__test_file_expected }}"
+    mode: "0644"
 
 - name: "{{ __test_component__log_save_test_results }} Save post test results from __test_output_file_path"
   when:
     - __test_component__vars.test_result_output_file|d(False)|bool
     - not __test_data.test_expected.failed|d(False)
   block:
-  - name: "{{ __test_component__log_save_test_results }} Display __test_output_file_path"
-    debug:
-      var: __test_output_file_path
+    - name: "{{ __test_component__log_save_test_results }} Display __test_output_file_path"
+      ansible.builtin.debug:
+        var: __test_output_file_path
 
-  - name: "{{ __test_component__log_save_test_results }} Save post test results to {{ __test_file_results_dir }}/{{ __test_file_results }}"
-    copy:
-      src: "{{ __test_output_file_path }}"
-      dest: "{{ __test_component__test_base_dir }}/{{ __test_file_results_dir }}/{{ __test_file_results }}"
+    - name: "{{ __test_component__log_save_test_results }} Save post test results to {{ 
+        __test_component__test_file_results_dir }}/{{ __test_component__test_file_results }}"
+      ansible.builtin.copy:
+        src: "{{ __test_output_file_path }}"
+        dest: "{{ __test_component__test_base_dir }}/{{ 
+          __test_component__test_file_results_dir }}/{{ __test_component__test_file_results }}"
+        mode: "0644"
 
-- name: "{{ __test_component__log_save_test_results }} Save post test `__test_filter_module_result` to {{ __test_file_results_dir }}/{{ __test_file_results }}"
+- name: "{{ __test_component__log_save_test_results }} Save post test `__test_filter_module_result` to {{ 
+    __test_component__test_file_results_dir }}/{{ __test_component__test_file_results }}"
   when:
     - not (__test_component__vars.test_result_output_file|d(False)|bool)
     - not __test_data.test_expected.failed|d(False)
@@ -189,29 +238,45 @@
 #    - __test_filter_module_result|d({})|length>0
 #    - __test_filter_module_result|d({})|dict2list|length>0
   block:
-  - name: "{{ __test_component__log_save_test_results }} Display __test_filter_module_result|d({})|length>0"
-    debug:
-      var: __test_filter_module_result|d({})|length>0
+    - name: "{{ __test_component__log_save_test_results }} Display __test_filter_module_result|d({})|length>0"
+      ansible.builtin.debug:
+        var: __test_filter_module_result|d({})|length>0
 
-  - name: "{{ __test_component__log_save_test_results }} Display __test_filter_module_result"
-    debug:
-      var: __test_filter_module_result
+    - name: "{{ __test_component__log_save_test_results }} Display __test_filter_module_result"
+      ansible.builtin.debug:
+        var: __test_filter_module_result
 
-  - name: "{{ __test_component__log_save_test_results }} Save post test `__test_filter_module_result` to {{ __test_file_results_dir }}/{{ __test_file_results }}"
-    copy:
-      content: "{{ __test_filter_module_result.result | to_nice_yaml(indent=2) }}"
-      dest: "{{ __test_component__test_base_dir }}/{{ __test_file_results_dir }}/{{ __test_file_results }}"
+    - name: "{{ __test_component__log_save_test_results }} Save post test `__test_filter_module_result` to {{ 
+        __test_component__test_file_results_dir }}/{{ __test_component__test_file_results }}"
+      ansible.builtin.template:
+        src: "test_actual_filter_results.yml.j2"
+        dest: "{{ __test_component__test_base_dir }}/{{ 
+          __test_component__test_file_results_dir }}/{{ __test_component__test_file_results }}"
+        mode: "0644"
+
+#    - name: "{{ __test_component__log_save_test_results }} Save post test `__test_filter_module_result` to {{
+#        __test_component__test_file_results_dir }}/{{ __test_component__test_file_results }}"
+#      ansible.builtin.copy:
+#        content: "{{ __test_filter_module_result.result | to_nice_yaml(indent=2) }}"
+##        content: "{{ __test_filter_module_result.result | to_nice_yaml(indent=2) }}"
+##        content: "{{ __test_filter_module_result | to_nice_yaml(indent=2) }}"
+#        dest: "{{ __test_component__test_base_dir }}/{{
+#          __test_component__test_file_results_dir }}/{{ __test_component__test_file_results }}"
+#        mode: "0644"
 
 - name: "{{ __test_component__log_save_test_results }} Initialize __test_component__git_comment_test_description"
-  set_fact:
-    __test_component__git_comment_test_description: "{{ __test_data.test_description | d('TEST ' + __test_case_id +': Save test results') }}"
+  ansible.builtin.set_fact:
+    __test_component__git_comment_test_description: "{{ 
+      __test_data.test_description | d('TEST ' + __test_case_id +': Save test results') }}"
 
 - name: "{{ __test_component__log_save_test_results }} Set __test_component__git_comment"
-  set_fact:
-    __test_component__git_comment: "{{ __test_component__git_comment_prefix }} - {{ __test_component__log_save_test_results }} {{ __test_component__git_comment_test_description }}"
+  ansible.builtin.set_fact:
+    __test_component__git_comment: "{{ 
+      __test_component__git_comment_prefix }} - {{ __test_component__log_save_test_results }} {{ 
+      __test_component__git_comment_test_description }}"
 
 - name: "{{ __test_component__log_save_test_results }} Display __test_component__git_comment"
-  debug:
+  ansible.builtin.debug:
     var: __test_component__git_comment
 
 - name: "{{ __test_component__log_save_test_results }} Git ACP update save test results"

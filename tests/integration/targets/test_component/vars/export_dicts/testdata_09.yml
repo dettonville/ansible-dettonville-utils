@@ -6,6 +6,6 @@ test_file_format: "csv"
 export_list: []
 
 test_expected:
-  changed: yes
-  failed: no
-  message: "The csv file has been created successfully at .*/{{ __test_file }}"
+  changed: true
+  failed: false
+  message: "The csv file has been created successfully at .*/{{ __test_component__test_file }}"

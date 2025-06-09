@@ -1,8 +1,8 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-# Copyright: (c) 2022, Lee Johnson (lee.james.johnson@gmail.com)
-# GNU General Public License v3.0+ (see COPYING or csv://www.gnu.org/licenses/gpl-3.0.txt)
+# Copyright: (c) 2025, Lee Johnson (ljohnson@dettonville.com)
+# MIT license (https://opensource.org/license/mit/)
 
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
@@ -178,7 +178,7 @@ EXAMPLES = '''
 
 - name: HTTPS | add/commit/push all file changes
   git_pacp:
-    user: dcc_common
+    user: username
     token: mytoken
     path: /Users/git/git_pacp
     branch: master
@@ -192,7 +192,7 @@ EXAMPLES = '''
     path: /Users/git/git_pacp
     branch: master
     comment: Add file1.
-    add: [ file1  ]
+    add: ['file1']
     remote: dev_test
     mode: ssh
     url: "git@gitlab.com:networkAutomation/git_test_module.git"
@@ -237,6 +237,7 @@ except ImportError:
     try:
         from ansible.module_utils.git_configuration import GitConfiguration
     except ImportError:
+        # noinspection PyUnresolvedReferences
         from ansible_collections.dettonville.utils.plugins.module_utils.git_configuration import GitConfiguration
 
 import logging

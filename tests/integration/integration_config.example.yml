@@ -2,7 +2,8 @@
 
 ## ref: https://github.com/ansible-collections/community.hashi_vault/blob/main/tests/integration/integration_config.yml.sample
 
-vault__test_repo_git_ssh_private_key: |
+#test_repo_git_ssh_private_key: "{{ lookup('env', 'ALS_git_pacp_SSH_KEY') }}"
+test_repo_git_ssh_private_key: |
   -----BEGIN OPENSSH PRIVATE KEY-----
   sfskdlfgjldfg sldkg
   sfskdlfgjldfg sldkg
@@ -11,9 +12,3 @@ vault__test_repo_git_ssh_private_key: |
   sfskdlfgjldfg sldkg
   dfg stysrthdfgbcvm sr,tyd=
   -----END OPENSSH PRIVATE KEY-----
-
-vault__test_repo_git_ssh_public_key: ecdsa-sha2-nistp384 AAAAEsdrhse5/gcd/+eny+0iuX9NNsTJw== ansible@example.org
-
-## AAP Galaxy creds
-vault__galaxy_token: "7d8a66dc45rgfcui"
-vault__galaxy_password: "f#$8fn&hfgs89dtt"

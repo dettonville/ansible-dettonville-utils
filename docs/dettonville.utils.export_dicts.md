@@ -4,19 +4,19 @@
 
 Version added: 1.0.0
 
--   [Synopsis](https://github.com/dettonville/ansible.utils/blob/main/docs/dettonville.utils.export_dicts.md#synopsis)
--   [Parameters](https://github.com/dettonville/ansible.utils/blob/main/docs/dettonville.utils.export_dicts.md#parameters)
--   [Notes](https://github.com/dettonville/ansible.utils/blob/main/docs/dettonville.utils.export_dicts.md#notes)
--   [Examples](https://github.com/dettonville/ansible.utils/blob/main/docs/dettonville.utils.export_dicts.md#examples)
--   [Return Values](https://github.com/dettonville/ansible.utils/blob/main/docs/dettonville.utils.export_dicts.md#return-values)
--   [Status](https://github.com/dettonville/ansible.utils/blob/main/docs/dettonville.utils.export_dicts.md#status)
+-   [Synopsis](https://github.com/dettonville/ansible-dettonville-utils/blob/main/docs/dettonville.utils.export_dicts.md#synopsis)
+-   [Parameters](https://github.com/dettonville/ansible-dettonville-utils/blob/main/docs/dettonville.utils.export_dicts.md#parameters)
+-   [Notes](https://github.com/dettonville/ansible-dettonville-utils/blob/main/docs/dettonville.utils.export_dicts.md#notes)
+-   [Examples](https://github.com/dettonville/ansible-dettonville-utils/blob/main/docs/dettonville.utils.export_dicts.md#examples)
+-   [Return Values](https://github.com/dettonville/ansible-dettonville-utils/blob/main/docs/dettonville.utils.export_dicts.md#return-values)
+-   [Status](https://github.com/dettonville/ansible-dettonville-utils/blob/main/docs/dettonville.utils.export_dicts.md#status)
 
-## [Synopsis](https://github.com/dettonville/ansible.utils/blob/main/docs/dettonville.utils.export_dicts.md#synopsis)
+## [Synopsis](https://github.com/dettonville/ansible-dettonville-utils/blob/main/docs/dettonville.utils.export_dicts.md#synopsis)
 
 - Write a list of flat dictionaries (a dictionary mapping fieldnames to strings or numbers) to a flat file using a
   specified format choice (csv or markdown) from a list of provided column names, headers and column list order.
 
-## [Parameters](https://github.com/dettonville/ansible.utils/blob/main/docs/dettonville.utils.export_dicts.md#parameters)
+## [Parameters](https://github.com/dettonville/ansible-dettonville-utils/blob/main/docs/dettonville.utils.export_dicts.md#parameters)
 
 | Parameter                       | Choices/Defaults | Configuration | Comments |
 |---------------------------------| --- | --- | --- |
@@ -26,7 +26,7 @@ Version added: 1.0.0
 | **column_list** list            |  |  | List of column dictionary specifications for each column in the file.
 
 
-## [Examples](https://github.com/dettonville/ansible.utils/blob/main/docs/dettonville.utils.export_dicts.md#examples)
+## [Examples](https://github.com/dettonville/ansible-dettonville-utils/blob/main/docs/dettonville.utils.export_dicts.md#examples)
 
 ```yaml
 - name: csv | Write file1.csv
@@ -81,9 +81,9 @@ Version added: 1.0.0
 ```
 
 
-## [Status](https://github.com/dettonville/ansible.utils/blob/main/docs/dettonville.utils.export_dicts.md#status)
+## [Status](https://github.com/dettonville/ansible-dettonville-utils/blob/main/docs/dettonville.utils.export_dicts.md#status)
 
 
-### [Authors](https://github.com/dettonville/ansible.utils/blob/main/docs/dettonville.utils.export_dicts.md#authors)
+### [Authors](https://github.com/dettonville/ansible-dettonville-utils/blob/main/docs/dettonville.utils.export_dicts.md#authors)
 
 -   Lee Johnson (@lj020326)

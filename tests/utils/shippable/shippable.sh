@@ -65,7 +65,7 @@ fi
 if [ "${SHIPPABLE_BUILD_ID:-}" ]; then
     export ANSIBLE_COLLECTIONS_PATH="${HOME}/.ansible"
     SHIPPABLE_RESULT_DIR="$(pwd)/shippable"
-    TEST_DIR="${ANSIBLE_COLLECTIONS_PATH}/ansible_collections/community/general"
+    TEST_DIR="${ANSIBLE_COLLECTIONS_PATH}/ansible_collections/dettonville/utils"
     mkdir -p "${TEST_DIR}"
     cp -aT "${SHIPPABLE_BUILD_DIR}" "${TEST_DIR}"
     cd "${TEST_DIR}"

@@ -10,6 +10,6 @@ export_list:
   - { key1: "value31", key2: "value32", key3: "value33", key4: "value34" }
 
 test_expected:
-  changed: no
-  failed: yes
+  changed: false
+  failed: true
   msg: "Destination directory .*{{ __test_component__vars.test_invalid_directory }} does not exist!"

@@ -1,0 +1,279 @@
+files:
+  test-results/junit-report.xml: |
+    <?xml version="1.0" ?>
+    <testsuites assertions="8" disabled="0" errors="0" failures="1" skipped="5" tests="7" time="0.0">
+    	<testsuite assertions="8" disabled="0" errors="0" failures="1" name="export_dicts" skipped="2" tests="4" time="0">
+    		<properties>
+    			<property name="collection_version" value="2024.5.3"/>
+    			<property name="component_git_commit_hash" value="98f3c9c"/>
+    			<property name="date" value="2024-05-25T18:17:27Z"/>
+    			<property name="failed" value="False"/>
+    			<property name="job_link" value="[test job link](https://infracicdd1s1.example.org/jenkins/job/INFRA/job/repo-test-automation/job/dettonville.utils/job/run-module-tests/job/develop-lj/949/)"/>
+    		</properties>
+    		<testcase name="01" assertions="4" classname="export_dicts">
+    			<properties>
+    				<property name="assertions" value="{'validate_changed': {'failed': False, 'msg': 'All assertions passed'}, 'validate_failed': {'failed': False, 'msg': 'All assertions passed'}, 'validate_message': {'failed': False, 'msg': 'All assertions passed'}, 'validate_results': {'failed': False, 'msg': 'All assertions passed'}}"/>
+    				<property name="collection_version" value="2024.5.3"/>
+    				<property name="component_git_branch" value="develop-lj"/>
+    				<property name="component_git_commit_hash" value="98f3c9c"/>
+    				<property name="date" value="2024-05-25T18:17:27Z"/>
+    				<property name="description" value="CSV test"/>
+    				<property name="failed" value="False"/>
+    				<property name="job_link" value="[test job link](https://infracicdd1s1.example.org/jenkins/job/INFRA/job/repo-test-automation/job/dettonville.utils/job/run-module-tests/job/develop-lj/949/)"/>
+    			</properties>
+    		</testcase>
+    		<testcase name="02" classname="export_dicts">
+    			<skipped type="skipped">test_suite_id:test_case_id=export_dicts:02 skipped</skipped>
+    		</testcase>
+    		<testcase name="03" assertions="4" classname="export_dicts">
+    			<failure type="failure">validate_results: {'failed': True, 'msg': 'Difference found between test_results and test_expected!'}</failure>
+    			<properties>
+    				<property name="assertions" value="{'validate_changed': {'failed': False, 'msg': 'All assertions passed'}, 'validate_failed': {'failed': False, 'msg': 'All assertions passed'}, 'validate_message': {'failed': False, 'msg': 'All assertions passed'}, 'validate_results': {'failed': True, 'msg': 'Difference found between test_results and test_expected!'}}"/>
+    				<property name="collection_version" value="2024.5.3"/>
+    				<property name="component_git_branch" value="develop-lj"/>
+    				<property name="component_git_commit_hash" value="98f3c9c"/>
+    				<property name="date" value="2024-05-25T18:17:27Z"/>
+    				<property name="description" value="CSV test - encoded string values"/>
+    				<property name="failed" value="False"/>
+    				<property name="job_link" value="[test job link](https://infracicdd1s1.example.org/jenkins/job/INFRA/job/repo-test-automation/job/dettonville.utils/job/run-module-tests/job/develop-lj/949/)"/>
+    			</properties>
+    		</testcase>
+    		<testcase name="04" classname="export_dicts">
+    			<skipped type="skipped">test_suite_id:test_case_id=export_dicts:04 skipped</skipped>
+    		</testcase>
+    	</testsuite>
+    	<testsuite disabled="0" errors="0" failures="0" name="git_acp" skipped="3" tests="3" time="0">
+    		<testcase name="01" classname="git_acp">
+    			<skipped type="skipped">test_suite_id:test_case_id=git_acp:01 skipped</skipped>
+    		</testcase>
+    		<testcase name="02" classname="git_acp">
+    			<skipped type="skipped">test_suite_id:test_case_id=git_acp:02 skipped</skipped>
+    		</testcase>
+    		<testcase name="03" classname="git_acp">
+    			<skipped type="skipped">test_suite_id:test_case_id=git_acp:03 skipped</skipped>
+    		</testcase>
+    	</testsuite>
+    </testsuites>
+
+  test-results/test-logger-results.yml: |
+    !TestSuites
+    test_suites:
+      export_dicts: !TestSuite
+        name: export_dicts
+        test_cases:
+          '01': !TestCase
+            name: '01'
+            assertions: 4
+            elapsed_sec:
+            timestamp:
+            classname: export_dicts
+            status:
+            category:
+            file:
+            line:
+            log:
+            url:
+            stdout:
+            stderr:
+            is_enabled: true
+            properties:
+              collection_version: 2024.5.3
+              component_git_branch: develop-lj
+              component_git_commit_hash: 98f3c9c
+              date: '2024-05-25T18:17:27Z'
+              description: CSV test
+              failed: false
+              job_link: '[test job link](https://infracicdd1s1.example.org/jenkins/job/INFRA/job/repo-test-automation/job/dettonville.utils/job/run-module-tests/job/develop-lj/949/)'
+              assertions:
+                validate_changed:
+                  failed: false
+                  msg: All assertions passed
+                validate_failed:
+                  failed: false
+                  msg: All assertions passed
+                validate_message:
+                  failed: false
+                  msg: All assertions passed
+                validate_results:
+                  failed: false
+                  msg: All assertions passed
+            errors: []
+            failures: []
+            skipped: []
+            allow_multiple_subelements: false
+          '02': !TestCase
+            name: '02'
+            assertions:
+            elapsed_sec:
+            timestamp:
+            classname: export_dicts
+            status:
+            category:
+            file:
+            line:
+            log:
+            url:
+            stdout:
+            stderr:
+            is_enabled: true
+            properties: {}
+            errors: []
+            failures: []
+            skipped:
+            - message:
+              output: test_suite_id:test_case_id=export_dicts:02 skipped
+            allow_multiple_subelements: false
+          '03': !TestCase
+            name: '03'
+            assertions: 4
+            elapsed_sec:
+            timestamp:
+            classname: export_dicts
+            status:
+            category:
+            file:
+            line:
+            log:
+            url:
+            stdout:
+            stderr:
+            is_enabled: true
+            properties:
+              collection_version: 2024.5.3
+              component_git_branch: develop-lj
+              component_git_commit_hash: 98f3c9c
+              date: '2024-05-25T18:17:27Z'
+              description: CSV test - encoded string values
+              failed: false
+              job_link: '[test job link](https://infracicdd1s1.example.org/jenkins/job/INFRA/job/repo-test-automation/job/dettonville.utils/job/run-module-tests/job/develop-lj/949/)'
+              assertions:
+                validate_changed:
+                  failed: false
+                  msg: All assertions passed
+                validate_failed:
+                  failed: false
+                  msg: All assertions passed
+                validate_message:
+                  failed: false
+                  msg: All assertions passed
+                validate_results:
+                  failed: true
+                  msg: Difference found between test_results and test_expected!
+            errors: []
+            failures:
+            - message:
+              output: "validate_results: {'failed': True, 'msg': 'Difference found between test_results and test_expected!'}"
+              type:
+            skipped: []
+            allow_multiple_subelements: false
+          '04': !TestCase
+            name: '04'
+            assertions:
+            elapsed_sec:
+            timestamp:
+            classname: export_dicts
+            status:
+            category:
+            file:
+            line:
+            log:
+            url:
+            stdout:
+            stderr:
+            is_enabled: true
+            properties: {}
+            errors: []
+            failures: []
+            skipped:
+            - message:
+              output: test_suite_id:test_case_id=export_dicts:04 skipped
+            allow_multiple_subelements: false
+        timestamp:
+        hostname:
+        id:
+        package:
+        file:
+        log:
+        url:
+        stdout:
+        stderr:
+        properties:
+      git_acp: !TestSuite
+        name: git_acp
+        test_cases:
+          '01': !TestCase
+            name: '01'
+            assertions:
+            elapsed_sec:
+            timestamp:
+            classname: git_acp
+            status:
+            category:
+            file:
+            line:
+            log:
+            url:
+            stdout:
+            stderr:
+            is_enabled: true
+            properties: {}
+            errors: []
+            failures: []
+            skipped:
+            - message:
+              output: test_suite_id:test_case_id=git_acp:01 skipped
+            allow_multiple_subelements: false
+          '02': !TestCase
+            name: '02'
+            assertions:
+            elapsed_sec:
+            timestamp:
+            classname: git_acp
+            status:
+            category:
+            file:
+            line:
+            log:
+            url:
+            stdout:
+            stderr:
+            is_enabled: true
+            properties: {}
+            errors: []
+            failures: []
+            skipped:
+            - message:
+              output: test_suite_id:test_case_id=git_acp:02 skipped
+            allow_multiple_subelements: false
+          '03': !TestCase
+            name: '03'
+            assertions:
+            elapsed_sec:
+            timestamp:
+            classname: git_acp
+            status:
+            category:
+            file:
+            line:
+            log:
+            url:
+            stdout:
+            stderr:
+            is_enabled: true
+            properties: {}
+            errors: []
+            failures: []
+            skipped:
+            - message:
+              output: test_suite_id:test_case_id=git_acp:03 skipped
+            allow_multiple_subelements: false
+        timestamp:
+        hostname:
+        id:
+        package:
+        file:
+        log:
+        url:
+        stdout:
+        stderr:
+        properties:

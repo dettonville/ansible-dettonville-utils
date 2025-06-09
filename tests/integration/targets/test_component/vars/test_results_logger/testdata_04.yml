@@ -1,0 +1,110 @@
+---
+
+test_description: "update nested test cases with junit report"
+
+test_expected:
+  changed: true
+  failed: false
+  message: "The test results file has been created successfully at .*"
+
+test_case_base_dir: "vars"
+test_results_dir: "test-results"
+test_case_file_prefix: "testdata_"
+
+test_results:
+  test_suites:
+    update_inventory:
+      properties:
+        test_collection_version: 2024.6.2
+        test_component_git_branch: feature/AIM-2648-dettonville.inventory-module-enhancements
+        test_component_git_commit_hash: a29a72b
+        test_date: '2024-06-16T01:30:10Z'
+        test_description: Add hosts with global groups enforcement
+        test_failed: false
+        test_job_link: '[test job link](https://infracicdd1s1.example.org/jenkins/job/INFRA/job/repo-test-automation/job/dettonville.utils/job/integration-tests/job/dettonville.inventory/job/run-module-tests/job/feature%252FAIM-2648-dettonville.inventory-module-enhancements/23/)'
+      test_cases:
+        combined01:
+          assertions:
+            validate_changed:
+              failed: false
+              msg: All assertions passed
+            validate_failed:
+              failed: false
+              msg: All assertions passed
+            validate_message:
+              failed: false
+              msg: All assertions passed
+            validate_results:
+              failed: false
+              msg: All assertions passed
+          test_collection_version: 2024.6.2
+          test_component_git_branch: feature/AIM-2648-dettonville.inventory-module-enhancements
+          test_component_git_commit_hash: 552f0e2
+          test_date: '2024-06-15T23:44:02Z'
+          test_description: Add groups
+          test_failed: false
+          test_job_link: '[test job link](https://infracicdd1s1.example.org/jenkins/job/INFRA/job/repo-test-automation/job/dettonville.utils/job/integration-tests/job/dettonville.inventory/job/run-module-tests/job/feature%252FAIM-2648-dettonville.inventory-module-enhancements/22/)'
+        group01:
+          assertions:
+            validate_changed:
+              failed: false
+              msg: All assertions passed
+            validate_failed:
+              failed: false
+              msg: All assertions passed
+            validate_message:
+              failed: false
+              msg: All assertions passed
+            validate_results:
+              failed: false
+              msg: All assertions passed
+          test_collection_version: 2024.6.2
+          test_component_git_branch: feature/AIM-2648-dettonville.inventory-module-enhancements
+          test_component_git_commit_hash: 552f0e2
+          test_date: '2024-06-15T23:44:02Z'
+          test_description: Add groups
+          test_failed: false
+          test_job_link: '[test job link](https://infracicdd1s1.example.org/jenkins/job/INFRA/job/repo-test-automation/job/dettonville.utils/job/integration-tests/job/dettonville.inventory/job/run-module-tests/job/feature%252FAIM-2648-dettonville.inventory-module-enhancements/22/)'
+
+test_start_data:
+  - file_path: vars/update_groups/testdata_group01.yml
+    is_raw: true
+    content: |
+      ---
+      test_description: "Add groups"
+
+  - file_path: vars/update_groups/testdata_group02.yml
+    is_raw: true
+    content: |
+      ---
+      test_description: "Update groups"
+
+  - file_path: vars/update_groups/testdata_group03.yml
+    is_raw: true
+    content: |
+      ---
+      test_description: "Overwrite groups"
+
+  - file_path: vars/update_inventory/testdata_combined01.yml
+    is_raw: true
+    content: |
+      ---
+      test_description: "Add groups and hosts"
+
+  - file_path: vars/update_inventory/update_groups/testdata_group01.yml
+    is_raw: true
+    content: |
+      ---
+      test_description: "Add groups"
+
+  - file_path: vars/update_inventory/update_groups/testdata_group02.yml
+    is_raw: true
+    content: |
+      ---
+      test_description: "Update groups"
+
+  - file_path: vars/update_inventory/update_groups/testdata_group03.yml
+    is_raw: true
+    content: |
+      ---
+      test_description: "Overwrite groups"

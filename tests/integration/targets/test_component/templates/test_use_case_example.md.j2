@@ -1,0 +1,95 @@
+
+# Test Use Case - Example [{{ __test_case_id }}]
+
+Use Case [{{ __test_case_id }}]: {{ __test_data.test_description }}
+
+{% set _expected_results_files = {} %}
+{% for _start_vars_item in __test_data.test_start_data|d([]) -%}
+{% set _var_file_path=__expected_results_dir + '/' + _start_vars_item.file_path %}
+{% set _var_file_content = _start_vars_item.content %}
+{% set _ = _expected_results_files.update({ _var_file_path: _var_file_content }) %}
+{%- endfor %}
+
+## Starting/Initial Setup
+
+### Initial Files
+
+{% if _expected_results_files|length>0 -%}
+{% for _expected_results_file_path in _expected_results_files.keys()|sort %}
+{% set _expected_results_file_ext = _expected_results_file_path.split('.')[-1] %}
+{% set _expected_results_file_content = _expected_results_files[_expected_results_file_path] %}
+{{ _expected_results_file_path }}:
+```yaml
+{% if _expected_results_file_content is string %}
+{{ _expected_results_file_content }}
+{% elif _expected_results_file_content is mapping %}
+{{ _expected_results_file_content | to_nice_yaml(indent=2) }}
+{% endif %}
+```
+
+{% endfor %}
+{% endif %}
+
+## Playbook Example
+
+{{ lookup('template', __test_component__use_case_run_file) }}
+
+{% set _expected_results_files = {} %}
+{% set _expected_files = __test_data.test_start_data|d([]) + __test_data.test_files|d([]) -%}
+{% for _expected_file in _expected_files -%}
+{%- if _expected_file.state|d('present') == 'present' %}
+{% set _expected_file_path=_expected_file.file_path %}
+{%- if _expected_file.is_raw|d(True) %}
+{% set _expected_file_content = _expected_file.content %}
+{%- else %}
+{% set _expected_file_content = _expected_file.content | to_nice_yaml(indent=2) | from_yaml %}
+{%- endif %}
+{% set _ = _expected_results_files.update({ _expected_file_path: _expected_file_content }) %}
+{%- endif %}
+{%- endfor %}
+{% for _expected_file in _expected_files -%}
+{%- if _expected_file.state|d('present') == 'absent' %}
+{% set _ = _expected_results_files.pop(_expected_file.file_path, None) %}
+{%- endif %}
+{%- endfor %}
+{%- set _expected_results = (lookup('template', __expected_results_template, errors='ignore') | from_yaml) %}
+{%- if _expected_results.files|d({})|length>0 %}
+{% for _expected_file_path, _expected_file_content in _expected_results.files.items() -%}
+{% set _ = _expected_results_files.update({ _expected_file_path: _expected_file_content }) %}
+{%- endfor %}
+{%- endif %}
+
+## Playbook Run Results
+
+The test example playbook run results:
+{{ lookup('template', __test_component__use_case_results_file) }}
+
+{% if __test_component__type == 'module' -%}
+### Resulting file content after running the playbook
+
+{% if __test_data.test_expected.changed|d(True)|bool -%}
+
+{% if _expected_results_files|length>0 -%}
+{% for _expected_results_file_path in _expected_results_files.keys()|sort %}
+{% set _expected_results_file_ext = _expected_results_file_path.split('.')[-1] %}
+{% set _expected_results_file_content = _expected_results_files[_expected_results_file_path] %}
+{{ _expected_results_file_path }}:
+```{{ _expected_results_file_ext }}
+{% if _expected_results_file_content is string %}
+{{ _expected_results_file_content }}
+{% elif _expected_results_file_content is mapping %}
+{{ _expected_results_file_content | to_nice_yaml(indent=2) }}
+{%- endif %}
+```
+
+{% endfor %}
+{% endif %}
+{% if _expected_results.links|d([])|length>0 -%}
+symlinks:
+  {{ _expected_results.links | to_nice_yaml(indent=2) | indent(2) }}
+{%- endif %}
+{% else %}
+
+No Files changed.
+{% endif %}
+{% endif %}

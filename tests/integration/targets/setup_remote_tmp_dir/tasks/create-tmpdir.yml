@@ -1,13 +1,46 @@
 ---
 
-- name: create temporary directory
-  tempfile:
+- name: "create-tmpdir | Display ansible_env"
+  ansible.builtin.debug:
+    var: ansible_env
+    verbosity: 1
+
+- name: "create-tmpdir | Set __setup_remote_tmp_dir__tmpdir_base"
+  when: ansible_env.HOME is defined
+  ansible.builtin.set_fact:
+    __setup_remote_tmp_dir__tmpdir_base: "{{ ansible_env.HOME }}/.ansible/tmp"
+
+- name: "create-tmpdir | Set __setup_remote_tmp_dir__tmpdir_base"
+  when: ansible_env.WORKSPACE_TMP is defined
+  ansible.builtin.set_fact:
+    __setup_remote_tmp_dir__tmpdir_base: "{{ ansible_env.WORKSPACE_TMP }}/.ansible/tmp"
+
+- name: "create-tmpdir | Create temporary base directory"
+  when: __setup_remote_tmp_dir__tmpdir_base is defined
+  block:
+    - name: "create-tmpdir | Display __setup_remote_tmp_dir__tmpdir_base"
+      ansible.builtin.debug:
+        var: __setup_remote_tmp_dir__tmpdir_base
+
+    - name: "create-tmpdir | Create temporary base directory"
+      ansible.builtin.file:
+        path: "{{ __setup_remote_tmp_dir__tmpdir_base }}"
+        state: directory
+        mode: "0755"
+
+- name: "create-tmpdir | Create temporary directory"
+  ansible.builtin.tempfile:
+    path: "{{ __setup_remote_tmp_dir__tmpdir_base | d(omit) }}"
     state: directory
     suffix: .test
   register: remote_tmp_dir_result
   notify:
     - delete temporary directory
 
-- name: record temporary directory
-  set_fact:
+- name: "create-tmpdir | Record temporary directory"
+  ansible.builtin.set_fact:
     remote_tmp_dir: "{{ remote_tmp_dir_result.path }}"
+
+- name: "create-tmpdir | Display remote_tmp_dir"
+  ansible.builtin.debug:
+    var: remote_tmp_dir

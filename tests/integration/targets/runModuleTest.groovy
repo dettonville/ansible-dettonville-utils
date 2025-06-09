@@ -12,10 +12,12 @@ Map config = [:]
 
 List testTags = [
     "export_dicts",
-    "sort_dict_list",
+    "git_pacp",
     "remove_dict_keys",
     "remove_sensitive_keys",
-    "git_pacp",
+    "sort_dict_list",
+    "test_results_logger",
+    "to_markdown",
     "all"
 ]
 

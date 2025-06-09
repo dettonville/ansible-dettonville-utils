@@ -69,7 +69,7 @@ PLAY RECAP *********************************************************************
 testhost                   : ok=101  changed=19   unreachable=0    failed=0    skipped=9    rescued=0    ignored=4   
 
 Run command: docker exec -i ansible-test-controller-Nl1njsLi sh -c 'tar cf - -C /root/ansible_collections/dettonville/inventory/tests --exclude .tmp output | gzip'
-Run command: tar oxzf - -C /Users/ljohnson/repos/silex/dettonville/dcc_common/collections/ansible_collections/dettonville/utils/tests
+Run command: tar oxzf - -C /Users/ljohnson/repos/ansible/ansible_collections/dettonville.utils/tests
 Run command: docker rm -f ansible-test-controller-Nl1njsLi
 
 ```
@@ -97,7 +97,7 @@ PLAY RECAP *********************************************************************
 testhost                   : ok=101  changed=19   unreachable=0    failed=0    skipped=9    rescued=0    ignored=4   
 
 Run command: docker exec -i ansible-test-controller-Nl1njsLi sh -c 'tar cf - -C /root/ansible_collections/dettonville/inventory/tests --exclude .tmp output | gzip'
-Run command: tar oxzf - -C /Users/ljohnson/repos/silex/dettonville/dcc_common/collections/ansible_collections/dettonville/inventory/tests
+Run command: tar oxzf - -C /Users/ljohnson/repos/ansible/ansible_collections/dettonville.utils/collections/ansible_collections/dettonville/inventory/tests
 Run command: docker rm -f ansible-test-controller-Nl1njsLi
 
 ```
@@ -123,8 +123,8 @@ Log onto the tower control node
 
 ```shell
 ## log into tower
-## sandbox => atrsbt1s4.dettonville.org
-ssh username@atrsbt1s4.dettonville.org
+## sandbox => atrsbt1s4.example.org
+ssh username@atrsbt1s4.example.org
 sudo su
 ```
 

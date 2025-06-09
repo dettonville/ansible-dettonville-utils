@@ -1,14 +1,52 @@
 ---
 
+- name: "{{ __test_component__log_run_test }} Set __test_component__test_file_format"
+  ansible.builtin.set_fact:
+    __test_component__test_file_format: "{{ __test_data.test_file_format
+      | d(__test_component__vars.test_file_format) | d(__test_component__test_file_format_default) }}"
+
+- name: "{{ __test_component__log_run_test }} Display __test_component__test_file_format [0]"
+  ansible.builtin.debug:
+    var: __test_component__test_file_format
+
+- name: "{{ __test_component__log_run_test }} Set __test_component__test_file_default"
+  ansible.builtin.set_fact:
+    __test_component__test_file_default: "{{ __test_component__test_file_testdata_prefix }}.{{ __test_component__test_file_format }}"
+#    __test_component__test_file_default: "{{ __test_component__vars.test_file | d(__test_component__test_file_default) }}"
+
+- name: "{{ __test_component__log_run_test }} Set __test_component__test_dir_default"
+  ansible.builtin.set_fact:
+    __test_component__test_dir_default: "{{ __test_component__test_base_dir }}/{{ __test_component__run_dir }}"
+
+- name: "{{ __test_component__log_run_test }} Set __test_component__test_dir"
+  ansible.builtin.set_fact:
+    __test_component__test_dir: "{{ __test_data.test_dir | d(__test_component__test_dir_default) }}"
+
+- name: "{{ __test_component__log_run_test }} Display __test_component__test_dir"
+  ansible.builtin.debug:
+    var: __test_component__test_dir
+
+- name: "{{ __test_component__log_run_test }} Set __test_component__test_file"
+  ansible.builtin.set_fact:
+    __test_component__test_file: "{{ __test_data.file | d(__test_component__test_file_default) }}"
+
+- name: "{{ __test_component__log_run_test }} Display __test_component__test_file"
+  ansible.builtin.debug:
+    var: __test_component__test_file
+
+- name: "{{ __test_component__log_run_test }} Set __test_component__test_case_args"
+  ansible.builtin.set_fact:
+    __test_component__test_case_args:
+      file: "{{ __test_component__test_dir }}/{{ __test_component__test_file }}"
+      format: "{{ __test_data.test_file_format | d(omit) }}"
+      columns: "{{ __test_data.columns | d(omit) }}"
+      export_list: "{{ __test_data.export_list }}"
+
 - name: "{{ __test_component__log_run_test }} Run test on {{ __test_component__collection }}.{{ __test_component }}"
   ignore_errors: yes
-  dettonville.utils.export_dicts:
-    file: "{{ __test_output_file_path }}"
-    format: "{{ __test_data.test_file_format | d(omit) }}"
-    columns: "{{ __test_data.columns | d(omit) }}"
-    export_list: "{{ __test_data.export_list }}"
+  dettonville.utils.export_dicts: "{{ __test_component__test_case_args }}"
   register: __test_component__test_result
 
 - name: "{{ __test_component__log_run_test }} Display __test_component__test_result"
-  debug:
+  ansible.builtin.debug:
     var: __test_component__test_result

@@ -1,46 +1,50 @@
 ---
 
-- name: "{{ __test_component__log_pretest }} Load test data for {{ __test_component }}"
+- name: "{{ __test_component__log_role_test }} Load test data for {{ __test_component }}"
 #  no_log: true
-  include_vars:
+  ansible.builtin.include_vars:
     file: "{{ item }}"
     name: __test_data
   with_first_found:
-  - "vars/test_{{ __test_case_id }}.yml"
-  - "vars/test_default.yml"
+    - "vars/test_{{ __test_case_id }}.yml"
+    - "vars/test_default.yml"
 
-- name: "{{ __test_component__log_pretest }} Display __test_data"
-  debug:
+- name: "{{ __test_component__log_role_test }} Display __test_data"
+  ansible.builtin.debug:
     var: __test_data
 
-- name: "{{ __test_component__log_pretest }} Assert __test_data set for {{ __test_component }}"
-  assert:
+- name: "{{ __test_component__log_role_test }} Assert __test_data set for {{ __test_component }}"
+  ansible.builtin.assert:
     that:
       - __test_data is defined
       - __test_data.test_description is defined
       - __test_data.test_expected is defined
 
-- name: "{{ __test_component__log_pretest }} Set __test_case_id"
-  set_fact:
-    __test_case_id: "{{ test_case_id | d(__test_data.test_case_id) }}"
+- name: "{{ __test_component__log_role_test }} Set __test_component__test_case_id"
+  ansible.builtin.set_fact:
+    __test_component__test_case_id: "{{ test_component__test_case_id | d(__test_data.test_case_id) }}"
 
-- name: "{{ __test_component__log_pretest }} Display __test_case_id"
-  debug:
+- name: "{{ __test_component__log_role_test }} Set __test_case_id"
+  ansible.builtin.set_fact:
+    __test_case_id: "{{ __test_component__test_case_id }}"
+
+- name: "{{ __test_component__log_role_test }} Display __test_case_id"
+  ansible.builtin.debug:
     var: __test_case_id
 
 ## Known issue : "junit.CallbackModule: Duplicate host callback"
 ## https://github.com/ansible/ansible/issues/50168
 ## https://github.com/ansible/ansible/commit/8f1b48714113538ae71eaf7c12199a788a00738a
 - name: "{{ __test_component__log_role_test }} Validate test role vars are defined"
-  assert:
+  ansible.builtin.assert:
     that:
       - __test_case_id is defined
       - __test_component is defined
-      - __test_file_results_base_dir is defined
-      - __test_file_results is defined
-      - __test_file_results_csv is defined
-      - __test_file_results_md is defined
-      - __test_file_expected is defined
+      - __test_component__test_file_results_base_dir is defined
+      - __test_component__test_file_results is defined
+      - __test_component__test_file_results_csv is defined
+      - __test_component__test_file_results_md is defined
+      - __test_component__test_file_expected is defined
       - __test_component__test_base_dir is defined
       - __test_component__git_comment_prefix is defined
       - __test_component__git_repo_url is defined
@@ -51,29 +55,29 @@
   when: __test_data.active|d(True)|bool
   block:
 
-  - name: "{{ __test_component__log_role_test }} Set __test_file_results_dir"
-    set_fact:
-      __test_file_results_dir: "{{ __test_file_results_base_dir }}/test_{{ __test_case_id }}"
+    - name: "{{ __test_component__log_role_test }} Set __test_component__test_file_results_dir"
+      ansible.builtin.set_fact:
+        __test_component__test_file_results_dir: "{{ __test_component__test_file_results_base_dir }}/test_{{ __test_case_id }}"
 
-  - name: "{{ __test_component__log_role_test }} Run test on {{ __test_component__collection }}.{{ __test_component }}"
-    include_tasks: "tests/{{ __test_component }}.yml"
+    - name: "{{ __test_component__log_role_test }} Run test on {{ __test_component__collection }}.{{ __test_component }}"
+      ansible.builtin.include_tasks: "tests/{{ __test_component }}.yml"
 
   rescue:
 
-  - name: "{{ __test_component__log_role_test }} Handle failure"
-    when: __role_results_list_all is not defined
-    set_fact:
-      __test_role__failed_info:
-        failed_task: "{{ failed_task }}"
-        failed_task_result: "{{ ansible_failed_result }}"
+    - name: "{{ __test_component__log_role_test }} Handle failure"
+      when: __role_results_list_all is not defined
+      ansible.builtin.set_fact:
+        __test_role__failed_info:
+          failed_task: "{{ failed_task }}"
+          failed_task_result: "{{ ansible_failed_result }}"
 
-  - name: "{{ __test_component__log_role_test }} Re-emit failure"
-    when: __test_component__fast_fail|bool
-    vars:
-      failed_task:
-        result: "{{ ansible_failed_result }}"
-    fail:
-      msg: '{{ failed_task }}'
+    - name: "{{ __test_component__log_role_test }} Re-emit failure"
+      when: __test_component__fast_fail|bool
+      vars:
+        failed_task:
+          result: "{{ ansible_failed_result }}"
+      ansible.builtin.fail:
+        msg: '{{ failed_task }}'
 
 - name: "{{ __test_component__log_role_test }} Process ROLE test results"
   delegate_to: localhost
@@ -82,11 +86,19 @@
   become: no
   block:
 
-  - name: "{{ __test_component__log_role_test }} Get Test Results for {{ __test_component__collection }}.{{ __test_component }}"
-    include_tasks: "tests/get_role_results_{{ __test_component }}.yml"
+    - name: "{{ __test_component__log_role_test }} Get Test Results for {{ __test_component__collection }}.{{ __test_component }}"
+      ansible.builtin.include_tasks: "tests/get_role_results_{{ __test_component }}.yml"
 
-  - name: "{{ __test_component__log_role_test }} Save test results"
-    include_tasks: save-test-results.yml
+    - name: "{{ __test_component__log_role_test }} Save test results"
+      ansible.builtin.include_tasks: save-test-results.yml
 
-  - name: "{{ __test_component__log_role_test }} Process Test Results"
-    include_tasks: process-test-results.yml
+    - name: "{{ __test_component__log_role_test }} Process Test Results"
+      ansible.builtin.include_tasks: process-test-results.yml
+
+    - name: "{{ __test_component__log_role_test }} Save __test_component__report_results to component report"
+      when: __test_component__report_results is defined
+      ansible.builtin.include_tasks: save-test-component-report.yml
+
+    - name: "{{ __test_component__log_role_test }} Save __test_component__report_results to summary report"
+      when: __test_component__report_results is defined
+      ansible.builtin.include_tasks: save-test-summary.yml

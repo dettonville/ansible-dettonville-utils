@@ -1,0 +1,17 @@
+
+```shell
+TASK [Run test on {{ __test_component__collection }}.{{ __test_component }}]
+
+TASK [Display __test_component__test_result]
+ok: [localhost] =>
+  {{ __test_component__test_result | to_nice_yaml(indent=2) | indent(2) }}
+
+TASK [Display __test_filter_result]
+ok: [localhost] =>
+{% if __test_filter_result is mapping or __test_filter_result is iterable %}
+  {{ __test_filter_result | to_nice_yaml(indent=2) | indent(2) }}
+{% else %}
+  {{ __test_filter_result | indent(2) }}
+{% endif %}
+
+```

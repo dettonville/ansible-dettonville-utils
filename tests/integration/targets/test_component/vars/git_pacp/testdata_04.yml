@@ -9,8 +9,8 @@ git_comment: "{{ __test_component__git_comment_prefix }} - SSH - expect default 
 git_ssh_params: "{{ __test_component__git_ssh_params }}"
 
 test_expected:
-  changed: yes
-  failed: no
+  changed: true
+  failed: false
 
 test_files:
   - file_path: foobar123.yml

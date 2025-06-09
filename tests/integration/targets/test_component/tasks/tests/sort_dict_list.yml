@@ -1,25 +1,29 @@
 ---
 
+- name: "{{ __test_component__log_run_test }} Set __test_component__test_case_args"
+  ansible.builtin.set_fact:
+    __test_component__test_case_args: "sort_keys={{ __test_data.sort_keys }}"
+
 - name: "{{ __test_component__log_run_test }} Run test on {{ __test_component__collection }}.{{ __test_component }}"
   ignore_errors: yes
-  set_fact:
-    __test_filter_result: "{{ __test_data.dict_list | dettonville.utils.sort_dict_list(__test_data.sort_keys) }}"
+  ansible.builtin.set_fact:
+    __test_filter_result: "{{ __test_data.test_object | dettonville.utils.sort_dict_list(sort_keys=__test_data.sort_keys) }}"
   register: __test_component__test_result
 
 - name: "{{ __test_component__log_run_test }} Display __test_component__test_result"
-  debug:
+  ansible.builtin.debug:
     var: __test_component__test_result
 
 - name: "{{ __test_component__log_run_test }} Display __test_filter_result"
-  debug:
+  ansible.builtin.debug:
     var: __test_filter_result
     verbosity: 1
 
 - name: "{{ __test_component__log_run_test }} Set __test_filter_module_result"
-  set_fact:
+  ansible.builtin.set_fact:
     __test_filter_module_result:
       result: "{{ __test_filter_result }}"
 
 - name: "{{ __test_component__log_run_test }} Display __test_filter_module_result"
-  debug:
+  ansible.builtin.debug:
     var: __test_filter_module_result

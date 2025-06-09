@@ -2,7 +2,7 @@
 
 test_description: "implied file format"
 
-file: "{{ __test_file_testdata_prefix }}.md"
+file: "{{ __test_component__test_file_testdata_prefix }}.md"
 
 export_list:
   - { key1: "value11", key2: "value12", key3: "value13", key4: "value14" }
@@ -11,6 +11,6 @@ export_list:
   - { key1: "value41", key2: "value42", key3: "value43", key4: "value44" }
 
 test_expected:
-  changed: yes
-  failed: no
-  message: "The markdown file has been created successfully at .*/{{ __test_file }}"
+  changed: true
+  failed: false
+  message: "The markdown file has been created successfully at .*/{{ __test_component__test_file }}"

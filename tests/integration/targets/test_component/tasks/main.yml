@@ -1,38 +1,35 @@
 ---
 
-- name: "Prepare test environment"
-  include_tasks: prepare.yml
+- name: "Init job vars"
+  ansible.builtin.include_tasks: init-job-vars.yml
 
-- name: Display other key test env data
-  debug:
-    msg:
-      - "ansible_python={{ ansible_python }}"
-      - "__dict_ordered_keys_supported={{__dict_ordered_keys_supported}}"
+- name: "Prepare test environment"
+  ansible.builtin.include_tasks: prepare.yml
 
 - name: "Set __test_component__test_case_id_list"
-  set_fact:
+  ansible.builtin.set_fact:
     __test_component__test_case_id_list: "{{ test_component__test_case_id_list | d([]) }}"
 
 - name: "Initialize __test_component__test_case_id_list"
-  set_fact:
+  ansible.builtin.set_fact:
     __test_component__test_case_id_list_patterns: ".*"
 
 - name: "Set __test_component__test_case_id_list"
   when: __test_component__test_case_id_list|length>0
-  set_fact:
+  ansible.builtin.set_fact:
     __test_component__test_case_id_list_patterns: "{{ __test_component__test_case_id_list | join('|') }}"
 
 - name: "Display __test_component__test_case_id_list"
-  debug:
+  ansible.builtin.debug:
     var: __test_component__test_case_id_list
 
 - name: "Display __test_component__test_case_id_list_patterns"
-  debug:
+  ansible.builtin.debug:
     var: __test_component__test_case_id_list_patterns
 
 - name: "Find test case variable data"
-  find:
-    paths: "{{ role_path }}/vars/{{ __test_component }}"
+  ansible.builtin.find:
+    paths: "{{ role_path }}/{{ __test_component__test_vars_dir }}/{{ __test_component }}"
     file_type: "file"
     patterns: 'testdata.*({{ __test_component__test_case_id_list_patterns }}).*\.yml'
     recurse: yes
@@ -41,20 +38,34 @@
   register: __test_component__test_var_files
 
 - name: "Display __test_component__test_var_files"
-  debug:
+  ansible.builtin.debug:
     var: __test_component__test_var_files
     verbosity: 2
 
 - name: "Set __test_component__test_var_file_paths"
-  set_fact:
-    __test_component__test_var_file_paths: "{{ __test_component__test_var_files.files | map(attribute='path') | list | sort }}"
+  ansible.builtin.set_fact:
+    __test_component__test_var_file_paths: "{{ __test_component__test_var_files.files 
+      | map(attribute='path') | list | sort }}"
 
 - name: "Display __test_component__test_var_file_paths"
-  debug:
+  ansible.builtin.debug:
     var: __test_component__test_var_file_paths
 
+- name: "Set __test_component__test_case_id_run_list"
+  ansible.builtin.set_fact:
+    __test_component__test_case_id_run_list: "{{ __test_component__test_var_file_paths 
+      | map('basename') | map('regex_replace', '^testdata_(.*).yml$', '\\1') | list | map('string') | sort }}"
+
+- name: "Display __test_component__test_case_id_run_list"
+  ansible.builtin.debug:
+    var: __test_component__test_case_id_run_list
+
 - name: "Run component tests from specified list"
-  include_tasks: run-component-test.yml
+  ansible.builtin.include_tasks: run-component-test.yml
   loop: "{{ __test_component__test_var_file_paths }}"
   loop_control:
     loop_var: __test_component__test_case_var_file
+
+- name: "Save __test_component__report_results to collection summary report"
+  when: __test_component__report_results is defined
+  ansible.builtin.include_tasks: save-test-summary.yml

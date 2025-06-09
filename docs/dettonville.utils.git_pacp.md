@@ -4,18 +4,18 @@
 
 Version added: 1.0.0
 
--   [Synopsis](https://github.com/dettonville/ansible.utils/blob/main/docs/dettonville.utils.git_pacp.md#synopsis)
--   [Parameters](https://github.com/dettonville/ansible.utils/blob/main/docs/dettonville.utils.git_pacp.md#parameters)
--   [Notes](https://github.com/dettonville/ansible.utils/blob/main/docs/dettonville.utils.git_pacp.md#notes)
--   [Examples](https://github.com/dettonville/ansible.utils/blob/main/docs/dettonville.utils.git_pacp.md#examples)
--   [Return Values](https://github.com/dettonville/ansible.utils/blob/main/docs/dettonville.utils.git_pacp.md#return-values)
--   [Status](https://github.com/dettonville/ansible.utils/blob/main/docs/dettonville.utils.git_pacp.md#status)
+-   [Synopsis](https://github.com/dettonville/ansible-dettonville-utils/blob/main/docs/dettonville.utils.git_pacp.md#synopsis)
+-   [Parameters](https://github.com/dettonville/ansible-dettonville-utils/blob/main/docs/dettonville.utils.git_pacp.md#parameters)
+-   [Notes](https://github.com/dettonville/ansible-dettonville-utils/blob/main/docs/dettonville.utils.git_pacp.md#notes)
+-   [Examples](https://github.com/dettonville/ansible-dettonville-utils/blob/main/docs/dettonville.utils.git_pacp.md#examples)
+-   [Return Values](https://github.com/dettonville/ansible-dettonville-utils/blob/main/docs/dettonville.utils.git_pacp.md#return-values)
+-   [Status](https://github.com/dettonville/ansible-dettonville-utils/blob/main/docs/dettonville.utils.git_pacp.md#status)
 
-## [Synopsis](https://github.com/dettonville/ansible.utils/blob/main/docs/dettonville.utils.git_pacp.md#synopsis)
+## [Synopsis](https://github.com/dettonville/ansible-dettonville-utils/blob/main/docs/dettonville.utils.git_pacp.md#synopsis)
 
 - Perform git operations including: 'clone', 'pull', 'acp', and 'pacp' (pull, add, commit and push).
 
-## [Parameters](https://github.com/dettonville/ansible.utils/blob/main/docs/dettonville.utils.git_pacp.md#parameters)
+## [Parameters](https://github.com/dettonville/ansible-dettonville-utils/blob/main/docs/dettonville.utils.git_pacp.md#parameters)
 
 | Parameter | Choices | Default | Configuration | Comments |
 | --- | --- | --- | --- | --- |
@@ -37,7 +37,7 @@ Version added: 1.0.0
 | **logging_level** | ['NOTSET', 'DEBUG', 'INFO', 'ERROR']  | 'INFO' |  | Parameter used to define the level of troubleshooting output.
 
 
-## [Examples](https://github.com/dettonville/ansible.utils/blob/main/docs/dettonville.utils.git_pacp.md#examples)
+## [Examples](https://github.com/dettonville/ansible-dettonville-utils/blob/main/docs/dettonville.utils.git_pacp.md#examples)
 
 ```yaml
 - name: "Perform git pull/add/commit/push"
@@ -127,9 +127,9 @@ Version added: 1.0.0
 ```
 
 
-## [Status](https://github.com/dettonville/ansible.utils/blob/main/docs/dettonville.utils.git_pacp.md#status)
+## [Status](https://github.com/dettonville/ansible-dettonville-utils/blob/main/docs/dettonville.utils.git_pacp.md#status)
 
 
-### [Authors](https://github.com/dettonville/ansible.utils/blob/main/docs/dettonville.utils.git_pacp.md#authors)
+### [Authors](https://github.com/dettonville/ansible-dettonville-utils/blob/main/docs/dettonville.utils.git_pacp.md#authors)
 
 -   Lee Johnson (@lj020326)

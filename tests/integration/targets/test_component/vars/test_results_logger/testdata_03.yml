@@ -1,0 +1,113 @@
+---
+
+test_description: "update test cases with junit report"
+
+test_expected:
+  changed: true
+  failed: false
+  message: "The test results file has been created successfully at .*"
+
+test_case_base_dir: "vars/tests"
+test_results_dir: "test-results"
+test_case_file_prefix: "testdata_"
+
+test_results:
+  test_suites:
+    export_dicts:
+      properties:
+        collection_version: 2024.5.3
+        component_git_commit_hash: 98f3c9c
+        date: '2024-05-25T18:17:27Z'
+        failed: false
+        job_link: '[test job link](https://infracicdd1s1.example.org/jenkins/job/INFRA/job/repo-test-automation/job/dettonville.utils/job/run-module-tests/job/develop-lj/949/)'
+      test_cases:
+        '01':
+          properties:
+            collection_version: 2024.5.3
+            component_git_branch: develop-lj
+            component_git_commit_hash: 98f3c9c
+            date: '2024-05-25T18:17:27Z'
+            description: CSV test
+            failed: false
+            job_link: '[test job link](https://infracicdd1s1.example.org/jenkins/job/INFRA/job/repo-test-automation/job/dettonville.utils/job/run-module-tests/job/develop-lj/949/)'
+            assertions:
+              validate_changed:
+                failed: false
+                msg: All assertions passed
+              validate_failed:
+                failed: false
+                msg: All assertions passed
+              validate_message:
+                failed: false
+                msg: All assertions passed
+              validate_results:
+                failed: false
+                msg: All assertions passed
+        '03':
+          properties:
+            collection_version: 2024.5.3
+            component_git_branch: develop-lj
+            component_git_commit_hash: 98f3c9c
+            date: '2024-05-25T18:17:27Z'
+            description: "CSV test - encoded string values"
+            failed: false
+            job_link: '[test job link](https://infracicdd1s1.example.org/jenkins/job/INFRA/job/repo-test-automation/job/dettonville.utils/job/run-module-tests/job/develop-lj/949/)'
+            assertions:
+              validate_changed:
+                failed: false
+                msg: All assertions passed
+              validate_failed:
+                failed: false
+                msg: All assertions passed
+              validate_message:
+                failed: false
+                msg: All assertions passed
+              validate_results:
+                failed: true
+                msg: Difference found between test_results and test_expected!
+
+
+test_start_data:
+  - file_path: vars/tests/export_dicts/testdata_01.yml
+    is_raw: true
+    content: |
+      ---
+      test_description: "CSV test"
+      test_file_format: "csv"
+
+  - file_path: vars/tests/export_dicts/testdata_02.yml
+    is_raw: true
+    content: |
+      ---
+      test_description: "CSV test - empty key value"
+      test_file_format: "csv"
+
+  - file_path: vars/tests/export_dicts/testdata_03.yml
+    is_raw: true
+    content: |
+      ---
+      test_description: "CSV test - encoded string values"
+
+  - file_path: vars/tests/export_dicts/testdata_04.yml
+    is_raw: true
+    content: |
+      ---
+      test_description: "CSV test - export with specified columns"
+
+  - file_path: vars/tests/git_acp/testdata_01.yml
+    is_raw: true
+    content: |
+      ---
+      test_description: "SSH - NO-OP - expect result with changed: false"
+
+  - file_path: vars/tests/git_acp/testdata_02.yml
+    is_raw: true
+    content: |
+      ---
+      test_description: "SSH - add test file"
+
+  - file_path: vars/tests/git_acp/testdata_03.yml
+    is_raw: true
+    content: |
+      ---
+      test_description: "SSH - add test file with explicit `add` path"

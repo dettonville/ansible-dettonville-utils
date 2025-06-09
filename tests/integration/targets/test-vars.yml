@@ -1,18 +1,20 @@
 ---
-
 host_key_checking: no
 
+ansible_python_interpreter: /usr/bin/env python3
 #ansible_python_interpreter: "/usr/bin/python3"
 #ansible_python_interpreter: "python3"
 #ansible_python_interpreter: /usr/bin/python3.8
 #ansible_python_interpreter: "python3.8"
-#ansible_python_interpreter: /usr/bin/env python3
 
 #setup_remote_tmp_dir__disable_cleanup: yes
+
+test_vault_env: "{{ vault_env | d('TEST') }}"
 
 ########
 ## Test component vars
 ########
+test_component__vault_env: "{{ test_vault_env }}"
 test_component__collection: "dettonville.utils"
 
 test_component__git_repo_url: "git@github.com:dettonville/ansible-test-automation.git"
@@ -20,9 +22,14 @@ test_component__git_repo_branch: "main"
 
 #test_component__test_base_dir: "{{ remote_tmp_dir }}/test.{{ test_component__collection }}"
 
-#test_component__git_test_results_enabled: no
+#test_component__git_test_results_enabled: false
+test_component__git_test_results_enabled: true
 
-test_component__git_ssh_private_key: "{{ vault__test_repo_git_ssh_private_key }}"
+#test_component__git_ssh_private_keydir: "{{ (deploy_key_location | dirname) | d(remote_tmp_dir) }}"
+#test_component__git_ssh_private_keydir: "{{ remote_tmp_dir }}"
+#test_component__git_ssh_private_keyfile: "{{ deploy_key_location }}"
+test_component__git_ssh_private_key_default: "{{ vault__ssh_creds[test_vault_env].bitbucket.private_key }}"
+test_component__git_ssh_private_key: "{{ '' if deploy_key_location is defined else test_component__git_ssh_private_key_default }}"
 
 test_component__git_user: "ansible"
 test_component__git_email: "ansible@dettonville.org"

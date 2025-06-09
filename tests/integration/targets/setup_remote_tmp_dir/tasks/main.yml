@@ -11,7 +11,4 @@
   when: ansible_facts == {}
 
 - name: "Create temporary directory"
-  include_tasks: "{{ item }}"
-  with_first_found:
-  - "create-tmpdir-{{ ansible_os_family | lower }}.yml"
-  - "create-tmpdir.yml"
+  ansible.builtin.include_tasks: create-tmpdir.yml

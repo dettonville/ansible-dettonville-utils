@@ -3,7 +3,7 @@
 
 # Dettonville Ansible Utilities Collection
 
-The Ansible ``dettonville.utils`` collection includes a variety of plugins that aid in the management, manipulation and visibility of data for the Ansible playbook developer.
+The Ansible ``dettonville.utils`` collection includes plugins/filters that aid management, manipulation and visibility of data for Ansible playbooks.
 
 <!--start requires_ansible-->
 ## Ansible version compatibility
@@ -21,7 +21,7 @@ PEP440 is the schema used to describe the versions of Ansible.
 ### Filter plugins
 Name | Description
 --- | ---
-[dettonville.utils.sort_dict_list](https://github.com/dettonville/ansible.utils/blob/main/docs/dettonville.utils.sort_dict_list.md)|Parse cli output or text using a variety of parsers
+[dettonville.utils.sort_dict_list](https://github.com/dettonville/ansible-dettonville-utils/blob/main/docs/dettonville.utils.sort_dict_list.md)|Parse cli output or text using a variety of parsers
 
 ### Lookup plugins
 Name | Description
@@ -30,8 +30,8 @@ Name | Description
 ### Modules
 Name | Description
 --- | ---
-[dettonville.utils.git_pacp](https://github.com/dettonville/ansible.utils/blob/main/docs/dettonville.utils.git_pacp.md)|Perform git operations including: 'clone', 'pull', 'acp', and 'pacp' (pull, add, commit and push).
-[dettonville.utils.export_dicts](https://github.com/dettonville/ansible.utils/blob/main/docs/dettonville.utils.export_dicts.md)|Write a list of flat dictionaries to a file with either csv or markdown format.
+[dettonville.utils.git_pacp](https://github.com/dettonville/ansible-dettonville-utils/blob/main/docs/dettonville.utils.git_pacp.md)|Perform git operations including: 'clone', 'pull', 'acp', and 'pacp' (pull, add, commit and push).
+[dettonville.utils.export_dicts](https://github.com/dettonville/ansible-dettonville-utils/blob/main/docs/dettonville.utils.export_dicts.md)|Write a list of flat dictionaries to a file with either csv or markdown format.
 
 ### Test plugins
 Name | Description
@@ -75,7 +75,7 @@ See the [Ansible Community Guide](https://docs.ansible.com/ansible/latest/commun
 
 - 100% code coverage is the goal, although it's not always possible. Please include unit and integration tests with all PRs. PRs should not cause a decrease in code coverage.
 - Filter plugins should be 1 per file, with an included DOCUMENTATION string, or reference a lookup plugin with the same name.
-- Action, filter, and lookup plugins should use argspec validation. See [AnsibleArgSpecValidator](https://github.com/dettonville/ansible.utils/blob/main/plugins/module_utils/common/argspec_validate.py).
+- Action, filter, and lookup plugins should use argspec validation. See [AnsibleArgSpecValidator](https://github.com/dettonville/ansible-dettonville-utils/blob/main/plugins/module_utils/common/argspec_validate.py).
 - This collection should not depend on other collections for imported code
 - Use of the latest version of black is required for formatting (black -l79)
 - The README contains a table of plugins. Use the [collection_prep](https://github.com/ansible-network/collection_prep) utilities to maintain this.
@@ -89,7 +89,7 @@ Please read and familiarize yourself with this document.
 
 ## Release notes
 <!--Add a link to a changelog.md file or an external docsite to cover this information. -->
-Release notes are available [here](https://github.com/dettonville/ansible.utils/blob/main/changelogs/CHANGELOG.rst)
+Release notes are available [here](https://github.com/dettonville/ansible-dettonville-utils/blob/main/changelogs/CHANGELOG.rst)
 For automated release announcements refer [here](https://twitter.com/AnsibleContent).
 
 

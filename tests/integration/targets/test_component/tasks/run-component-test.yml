@@ -1,78 +1,121 @@
 ---
 
 - name: "{{ __test_component__log_pretest }} Display __test_component__test_case_var_file"
-  debug:
+  ansible.builtin.debug:
     var: __test_component__test_case_var_file
 
 - name: "{{ __test_component__log_pretest }} Set __test_component__test_case_id"
-  set_fact:
+  ansible.builtin.set_fact:
     __test_component__test_case_id: "{{ __test_component__test_case_var_file | basename
       | regex_replace('^testdata_(.*).yml$', '\\1') }}"
 
-- name: "{{ __test_component__log_pretest }} Set __test_component__vars_dir"
-  set_fact:
-    __test_component__vars_dir: "{{ role_path }}/vars/"
+- name: "{{ __test_component__log_component_test }} Set __test_component__test_vars_path"
+  ansible.builtin.set_fact:
+    __test_component__test_vars_path: "{{ role_path }}/{{ __test_component__test_vars_dir }}/"
 
-- name: "{{ __test_component__log_pretest }} Set __test_component__test_case_group_dir"
-  set_fact:
-    __test_component__test_case_dir: "{{ __test_component__test_case_var_file | dirname | replace(__test_component__vars_dir, '') }}"
+- name: "{{ __test_component__log_component_test }} Set __test_component__test_case_group_dir"
+  ansible.builtin.set_fact:
+    __test_component__test_case_dir: "{{ __test_component__test_case_var_file | dirname | replace(__test_component__test_vars_path, '') }}"
 
-- name: "{{ __test_component__log_pretest }} Display __test_component__test_case_dir"
-  debug:
+- name: "{{ __test_component__log_component_test }} Display __test_component__test_case_dir"
+  ansible.builtin.debug:
     var: __test_component__test_case_dir
 
-- name: "{{ __test_component__log_pretest }} Display __test_component__test_case_id"
-  debug:
+- name: "{{ __test_component__log_component_test }} Display __test_component__test_case_id"
+  ansible.builtin.debug:
     var: __test_component__test_case_id
 
-- name: "{{ __test_component__log_pretest }} Load test data from {{ __test_component__test_case_var_file }}"
-  include_vars:
+- name: "{{ __test_component__log_component_test }} Load test data from {{ __test_component__test_case_var_file }}"
+  ansible.builtin.include_vars:
     file: "{{ __test_component__test_case_var_file }}"
     name: __test_data
-#  no_log: true
 
-- name: "{{ __test_component__log_pretest }} Display __test_data"
-  debug:
+- name: "{{ __test_component__log_component_test }} Display __test_data"
+  ansible.builtin.debug:
     var: __test_data
 
-- name: "{{ __test_component__log_pretest }} Set __test_case_id"
-  set_fact:
+- name: "{{ __test_component__log_component_test }} Assert __test_data set for {{ __test_component }}"
+  ansible.builtin.assert:
+    that:
+      - __test_data is defined
+      - __test_data.test_description is defined
+      - __test_data.test_expected is defined
+
+- name: "{{ __test_component__log_component_test }} Set __test_case_id"
+  ansible.builtin.set_fact:
     __test_case_id: "{{ __test_component__test_case_id }}"
 #    __test_case_id: "{{ __test_data.test_case_id | d(__test_component__test_case_id) }}"
 
-- name: "{{ __test_component__log_pretest }} Display __test_case_id"
-  debug:
+- name: "{{ __test_component__log_component_test }} Display __test_case_id"
+  ansible.builtin.debug:
     var: __test_case_id
 
-- name: "{{ __test_component__log_pretest }} Init __test_filter_module_result"
-  set_fact:
-    __test_filter_module_result: {}
+- name: "{{ __test_component__log_component_test }} Set __test_component__type"
+  ansible.builtin.set_fact:
+    __test_component__type: "{{ __test_data.test_component__type
+      | d(__test_component__vars.test_component__type) | d(__test_component__type_default) }}"
+
+- name: "{{ __test_component__log_component_test }} Display __test_component__type"
+  ansible.builtin.debug:
+    var: __test_case_id
+
+- name: "{{ __test_component__log_component_test }} Set __test_component__run_count"
+  ansible.builtin.set_fact:
+#    __test_component__run_count: "{{ __test_component__run_count_by_component[__test_component]|d(0)| int + 1 }}"
+    __test_component__run_count: "{{ hostvars.localhost.__test_component__global_run_count_by_component[__test_component]|d(0)| int + 1 }}"
+    __test_component__run_count_total: "{{ hostvars.localhost.__test_component__run_count_total|d(0)| int + 1 }}"
+
+- name: "{{ __test_component__log_component_test }} Display __test_component__run_count"
+  ansible.builtin.debug:
+    var: __test_component__run_count
+
+- name: "{{ __test_component__log_component_test }} Set __test_component__run_count_by_component"
+  ansible.builtin.set_fact:
+    __test_component__run_count_by_component: "{{ __test_component__run_count_by_component|d({})
+      | combine( { __test_component: __test_component__run_count} ) }}"
+
+- name: "{{ __test_component__log_component_test }} Display __test_component__run_count_by_component"
+  ansible.builtin.debug:
+    var: __test_component__run_count_by_component
+
+## ref: https://stackoverflow.com/questions/66525326/how-to-delegate-facts-to-localhost-from-a-play-targeting-remote-hosts
+- name: "{{ __test_component__log_component_test }} Set __test_component__global_run_count_by_component"
+  run_once: true
+  delegate_to: localhost
+  delegate_facts: true
+  block:
+    - name: "{{ __test_component__log_component_test }} Set __test_component__global_run_count_by_component"
+      ansible.builtin.set_fact:
+        __test_component__global_run_count_by_component: "{{ __test_component__global_run_count_by_component|d({})
+          | combine( { __test_component: __test_component__run_count} ) }}"
+        __test_component__run_count_total: "{{ __test_component__run_count_total }}"
+
+    - name: "{{ __test_component__log_component_test }} Display __test_component__global_run_count_by_component"
+      ansible.builtin.debug:
+        var: __test_component__global_run_count_by_component
+
+    - name: "{{ __test_component__log_component_test }} Display __test_component__run_count_total"
+      ansible.builtin.debug:
+        var: __test_component__run_count_total
 
 ## Known issue : "junit.CallbackModule: Duplicate host callback"
 ## https://github.com/ansible/ansible/issues/50168
 ## https://github.com/ansible/ansible/commit/8f1b48714113538ae71eaf7c12199a788a00738a
 - name: "{{ __test_component__log_component_test }} Validate test component vars are defined"
-  assert:
+  ansible.builtin.assert:
     that:
       - __test_case_id is defined
       - __test_component is defined
-      - __test_file_results_base_dir is defined
-      - __test_file_results is defined
-      - __test_file_results_csv is defined
-      - __test_file_results_md is defined
-#      - __test_file_expected is defined
+      - __test_component__test_file_results_base_dir is defined
+      - __test_component__test_file_results is defined
+      - __test_component__test_file_results_csv is defined
+      - __test_component__test_file_results_md is defined
+#      - __test_component__test_file_expected is defined
       - __test_component__test_base_dir is defined
       - __test_component__git_comment_prefix is defined
       - __test_component__git_repo_url is defined
       - __test_component__git_repo_branch is defined
       - __test_component__git_ssh_params is defined
-
-- name: "{{ __test_component__log_component_test }} Assert __test_data set for {{ __test_component }}"
-  assert:
-    that:
-      - __test_data is defined
-      - __test_data.test_description is defined
-      - __test_data.test_expected is defined
 
 - name: "{{ __test_component__log_component_test }} Run test case if active"
   when:
@@ -80,27 +123,36 @@
     - not __skip_test|d(False)|bool
   block:
 
-  - name: "{{ __test_component__log_reset }} Set __test_file_results_dir"
-    set_fact:
-      __test_file_results_dir: "{{ __test_file_results_base_dir }}/test_{{ __test_case_id }}"
+    - name: "{{ __test_component__log_component_test }} Set __test_component__test_file_results_dir"
+      ansible.builtin.set_fact:
+        __test_component__test_file_results_dir: "{{ __test_component__test_file_results_base_dir }}/test_{{ __test_case_id }}"
 
-  - name: "{{ __test_component__log_reset }} Display __test_file_results_dir"
-    debug:
-      var: __test_file_results_dir
+    - name: "{{ __test_component__log_component_test }} Display __test_component__test_file_results_dir"
+      ansible.builtin.debug:
+        var: __test_component__test_file_results_dir
 
-  - name: "{{ __test_component__log_component_test }} Reset test data to start"
-    when: __test_data.reset_required|d(__test_component__data_reset_required)|d(True)|bool
-    include_tasks: reset-test-data.yml
+    - name: "{{ __test_component__log_component_test }} Reset test data to start"
+      when: __test_data.reset_required|d(__test_component__data_reset_required)|d(True)|bool
+      ansible.builtin.include_tasks: reset-test-data.yml
 
-  - name: "{{ __test_component__log_component_test }} Run test on {{ __test_component__collection }}.{{ __test_component }}"
-    include_tasks: "tests/{{ __test_component }}.yml"
+    - name: "{{ __test_component__log_component_test }} Init __test_filter_module_result"
+      ansible.builtin.set_fact:
+        __test_filter_module_result: {}
 
-  - name: "{{ __test_component__log_component_test }} Save test results"
-    include_tasks: save-test-results.yml
+    - name: "{{ __test_component__log_component_test }} Init __test_component__test_case_args"
+      ansible.builtin.set_fact:
+        __test_component__test_case_args: ''
+    #    __test_component__test_case_args: {}
 
-  - name: "{{ __test_component__log_component_test }} Process Test Results"
-    include_tasks: process-test-results.yml
+    - name: "{{ __test_component__log_component_test }} Run test on {{ __test_component__collection }}.{{ __test_component }}"
+      ansible.builtin.include_tasks: "tests/{{ __test_component }}.yml"
 
-  - name: "{{ __test_component__log_component_test }} Save __test_component__report_results"
-    when: __test_component__report_results is defined
-    include_tasks: finish-test-run.yml
+    - name: "{{ __test_component__log_component_test }} Save test results"
+      ansible.builtin.include_tasks: save-test-results.yml
+
+    - name: "{{ __test_component__log_component_test }} Process Test Results"
+      ansible.builtin.include_tasks: process-test-results.yml
+
+    - name: "{{ __test_component__log_component_test }} Save __test_component__report_results to component report"
+      when: __test_component__report_results is defined
+      ansible.builtin.include_tasks: save-test-component-report.yml

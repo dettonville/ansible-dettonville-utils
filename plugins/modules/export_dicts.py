@@ -1,7 +1,7 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-# Copyright: (c) 2023, Lee Johnson (ljohnson@silexdata.com)
+# Copyright: (c) 2023, Lee Johnson (ljohnson@dettonville.com)
 # Apache License v2.0
 
 
@@ -103,7 +103,6 @@ EXAMPLES = r'''
       - { key1: "value21", key2: "ﬀöø", key3: "value23", key4: "value24" }
       - { key1: "value31", key2: "value32", key3: "ḃâŗ", key4: "value34" }
       - { key1: "value41", key2: "value42", key3: "ﬀöø", key4: "båz" }
-
 '''  # NOQA
 
 RETURN = r'''
@@ -126,102 +125,13 @@ changed:
 # noqa: E402 - ansible module imports must occur after docs
 from ansible.module_utils.basic import AnsibleModule
 
-import csv
 import os
 import sys
-import traceback
-import codecs
 import logging
 import pprint
 
+from ansible_collections.dettonville.utils.plugins.module_utils.export_dict_utils import write_markdown_file, write_csv_file
 
-def get_headers_and_fields(column_list):
-    fieldnames = [column["name"] for column in column_list]
-    headers = [column["header"] for column in column_list]
-
-    # just in case the headers were not specified
-    if not headers:
-        headers = fieldnames
-
-    return headers, fieldnames
-
-
-# ref: https://docs.python.org/3/library/csv.html
-# ref: https://realpython.com/python-csv/
-# ref: https://www.geeksforgeeks.org/writing-csv-files-in-python/
-def write_csv(module, output_file, export_list, column_list):
-    (headers, fieldnames) = get_headers_and_fields(column_list)
-
-    try:
-        with open(output_file, mode='w') as csv_file:
-            writer = csv.DictWriter(csv_file, lineterminator='\n', fieldnames=fieldnames, extrasaction='ignore')
-
-            header_row_dict = dict(zip(fieldnames, headers))
-
-            # print('header_row_dict: %s' % header_row_dict)
-
-            writer.writerow(header_row_dict)
-            writer.writerows(export_list)
-
-            # for row in list_of_rows:
-            #     row_output = [row[column.name] for column in column_list]
-            #     writer.writerow(row_output)
-
-    except IOError:
-        module.fail_json(msg="Unable to create file %s", traceback=traceback.format_exc())
-
-    result = dict(
-        changed=True,
-        message="The csv file has been created successfully at {0}".format(output_file)
-    )
-
-    return result
-
-
-# ref: https://cppsecrets.com/users/1102811497104117108109111104116975048484864103109971051084699111109/Convert-a-CSV-file-to-a-table-in-a-markdown-file.php # noqa: E501 url size exceeds 120
-def write_markdown(module, output_file, export_list, column_list):
-    # print('column_list: %s' % column_list)
-    (headers, fieldnames) = get_headers_and_fields(column_list)
-    
-    md_string = " | "
-    for header in headers:
-        md_string += header + " | "
-
-    md_string += "\n |"
-    for i in range(len(headers)):
-        md_string += "--- | "
-
-    md_string += "\n"
-    for row in export_list:
-        module.log('row = %s' % str(row))
-        md_string += " | "
-        for column in column_list:
-            if column['name'] in row:
-                column_value = row[column['name']]
-            else:
-                column_value = ''
-            module.log('column_value = %s' % str(column_value))
-            md_string += str(column_value) + " | "
-        md_string += "\n"
-
-    try:
-        file = codecs.open(output_file, "w", encoding="utf-8")
-        if sys.version_info >= (3, 6):
-            file.write(md_string)
-        else:
-            file.write(md_string.decode('utf-8'))
-
-        file.close()
-
-    except IOError:
-        module.fail_json(msg="Unable to create file %s", traceback=traceback.format_exc())
-
-    result = dict(
-        changed=True,
-        message="The markdown file has been created successfully at {0}".format(output_file)
-    )
-
-    return result
 
 def get_file_format(file):
     # type: (str) -> [str]
@@ -229,6 +139,7 @@ def get_file_format(file):
     if "." in file:
         format = file.split('.')[-1].lower()
     return format
+
 
 def main():
     # seed the result dict in the object
@@ -308,9 +219,9 @@ def main():
             module.fail_json(msg='Column name not found', **result)
 
     if file_format == "md":
-        export_result = write_markdown(module, file, export_list, column_list)
+        export_result = write_markdown_file(module, file, export_list, column_list)
     elif file_format == "csv":
-        export_result = write_csv(module, file, export_list, column_list)
+        export_result = write_csv_file(module, file, export_list, column_list)
 
     # print('export_result: %s' % export_result)
 

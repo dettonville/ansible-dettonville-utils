@@ -4,19 +4,19 @@
 
 Version added: 1.0.0
 
--   [Synopsis](https://github.com/dettonville/ansible.utils/blob/main/docs/dettonville.utils.sort_dict_list.md#synopsis)
--   [Parameters](https://github.com/dettonville/ansible.utils/blob/main/docs/dettonville.utils.sort_dict_list.md#parameters)
--   [Notes](https://github.com/dettonville/ansible.utils/blob/main/docs/dettonville.utils.sort_dict_list.md#notes)
--   [Examples](https://github.com/dettonville/ansible.utils/blob/main/docs/dettonville.utils.sort_dict_list.md#examples)
--   [Return Values](https://github.com/dettonville/ansible.utils/blob/main/docs/dettonville.utils.sort_dict_list.md#return-values)
--   [Status](https://github.com/dettonville/ansible.utils/blob/main/docs/dettonville.utils.sort_dict_list.md#status)
+-   [Synopsis](https://github.com/dettonville/ansible-dettonville-utils/blob/main/docs/dettonville.utils.sort_dict_list.md#synopsis)
+-   [Parameters](https://github.com/dettonville/ansible-dettonville-utils/blob/main/docs/dettonville.utils.sort_dict_list.md#parameters)
+-   [Notes](https://github.com/dettonville/ansible-dettonville-utils/blob/main/docs/dettonville.utils.sort_dict_list.md#notes)
+-   [Examples](https://github.com/dettonville/ansible-dettonville-utils/blob/main/docs/dettonville.utils.sort_dict_list.md#examples)
+-   [Return Values](https://github.com/dettonville/ansible-dettonville-utils/blob/main/docs/dettonville.utils.sort_dict_list.md#return-values)
+-   [Status](https://github.com/dettonville/ansible-dettonville-utils/blob/main/docs/dettonville.utils.sort_dict_list.md#status)
 
-## [Synopsis](https://github.com/dettonville/ansible.utils/blob/main/docs/dettonville.utils.sort_dict_list.md#synopsis)
+## [Synopsis](https://github.com/dettonville/ansible-dettonville-utils/blob/main/docs/dettonville.utils.sort_dict_list.md#synopsis)
 
 -   Validate _data_ with provided _criteria_ based on the validation _engine_.
 -   Using the parameters below- `data|dettonville.utils.sort_dict_list(sort_keys)`
 
-## [Parameters](https://github.com/dettonville/ansible.utils/blob/main/docs/dettonville.utils.sort_dict_list.md#parameters)
+## [Parameters](https://github.com/dettonville/ansible-dettonville-utils/blob/main/docs/dettonville.utils.sort_dict_list.md#parameters)
 
 | Parameter | Choices/Defaults | Configuration | Comments |
 | --- | --- | --- | --- |
@@ -24,7 +24,7 @@ Version added: 1.0.0
 | **sort_keys** raw / required |  |  | The list of sort keys used to sort the list of dictionaries.
 
 
-## [Examples](https://github.com/dettonville/ansible.utils/blob/main/docs/dettonville.utils.sort_dict_list.md#examples)
+## [Examples](https://github.com/dettonville/ansible-dettonville-utils/blob/main/docs/dettonville.utils.sort_dict_list.md#examples)
 
 ```yaml
 - name: Sort a list of dictionaries based on single key sort
@@ -143,9 +143,9 @@ Version added: 1.0.0
 ```
 
 
-## [Status](https://github.com/dettonville/ansible.utils/blob/main/docs/dettonville.utils.sort_dict_list.md#status)
+## [Status](https://github.com/dettonville/ansible-dettonville-utils/blob/main/docs/dettonville.utils.sort_dict_list.md#status)
 
 
-### [Authors](https://github.com/dettonville/ansible.utils/blob/main/docs/dettonville.utils.sort_dict_list.md#authors)
+### [Authors](https://github.com/dettonville/ansible-dettonville-utils/blob/main/docs/dettonville.utils.sort_dict_list.md#authors)
 
 -   Lee Johnson (@lj020326)

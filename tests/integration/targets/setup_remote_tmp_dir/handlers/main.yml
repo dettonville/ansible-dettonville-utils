@@ -2,7 +2,7 @@
 
 - name: delete temporary directory
   when: not setup_remote_tmp_dir__disable_cleanup|d(False)|bool
-  include_tasks: "{{ item }}"
-  with_first_found:
-  - "tasks/cleanup-{{ ansible_os_family | lower }}.yml"
-  - "tasks/cleanup.yml"
+  delegate_to: localhost
+  connection: local
+  run_once: yes
+  ansible.builtin.import_tasks: tasks/cleanup.yml

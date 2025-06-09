@@ -1,0 +1,165 @@
+---
+
+- name: "{{ __test_component__log_pretest_setup_test_workdir }} Set __test_component__git_ssh_private_keydir"
+  when: test_component__git_ssh_private_keyfile is defined
+  ansible.builtin.set_fact:
+    __test_component__git_ssh_private_keydir: "{{ test_component__git_ssh_private_keyfile | dirname }}"
+
+- name: "{{ __test_component__log_pretest_setup_test_workdir }} Source ssh key from vault"
+  when: test_component__git_ssh_private_keyfile is not defined
+  ansible.builtin.include_tasks: source-ssh-key-from-vault.yml
+
+- name: "{{ __test_component__log_pretest_setup_test_workdir }} Display __test_component__git_ssh_params"
+  ansible.builtin.debug:
+    var: __test_component__git_ssh_params
+#    verbosity: 1
+
+- name: "{{ __test_component__log_pretest_setup_test_workdir }} Remove {{ __test_component__test_base_dir }}"
+  ansible.builtin.file:
+    path: "{{ __test_component__test_base_dir }}"
+    state: absent
+
+## Clone, initialize, and add/commit/push the test repo with test data
+- name: "{{ __test_component__log_pretest_setup_test_workdir }} Clone test repo to {{ __test_component__test_base_dir }}"
+  when: (__test_component__git_test_results_enabled|bool) or __test_component == 'git_pacp'
+  dettonville.utils.git_pacp:
+    action: clone
+    path: "{{ __test_component__test_base_dir }}"
+    branch: "{{ __test_component__git_repo_branch }}"
+    url: "{{ __test_component__git_repo_url }}"
+    ssh_params: "{{ __test_component__git_ssh_params }}"
+    user_name: "{{ __test_component__git_user }}"
+    user_email: "{{ __test_component__git_email }}"
+  register: __test_component__git_clone_result
+
+- name: "{{ __test_component__log_pretest_setup_test_workdir }} Display __test_component__git_clone_result"
+  ansible.builtin.debug:
+    var: __test_component__git_clone_result
+
+- name: "{{ __test_component__log_pretest_setup_test_workdir }} Display __test_component__git_reset_test_dir"
+  ansible.builtin.debug:
+    var: __test_component__git_reset_test_dir
+
+- name: "{{ __test_component__log_pretest_setup_test_workdir }} Reset test dir {{ __test_component__run_dir }}"
+#  when: __test_component__git_reset_test_dir|d(True)|bool
+  ansible.builtin.file:
+    path: "{{ __test_component__test_base_dir }}/{{ __test_component__run_dir }}"
+    state: absent
+
+- name: "{{ __test_component__log_pretest_setup_test_workdir }} Display __test_component__git_reset_component_dir"
+  ansible.builtin.debug:
+    var: __test_component__git_reset_component_dir
+
+- name: "{{ __test_component__log_pretest_setup_test_workdir }} Reset test component base dir {{ __test_component__component_dir }}"
+  when: __test_component__git_reset_component_dir|d(True)|bool
+  ansible.builtin.file:
+    path: "{{ __test_component__test_base_dir }}/{{ __test_component__component_dir }}"
+    state: absent
+
+- name: "{{ __test_component__log_pretest_setup_test_workdir }} Display __test_component__run_count_total"
+  ansible.builtin.debug:
+    var: __test_component__run_count_total
+
+- name: "{{ __test_component__log_pretest_setup_test_workdir }} Display ansible_run_tags"
+  ansible.builtin.debug:
+    var: ansible_run_tags
+
+- name: "{{ __test_component__log_pretest_setup_test_workdir }} Set __test_component__git_reset_test_base_dir"
+  ansible.builtin.set_fact:
+    __test_component__git_reset_test_base_dir: "{{ ansible_run_tags|d([])==['all'] 
+      and __test_component__run_count_total|d(0)|int==0 }}"
+
+- name: "{{ __test_component__log_pretest_setup_test_workdir }} Display __test_component__git_reset_test_base_dir"
+  ansible.builtin.debug:
+    var: __test_component__git_reset_test_base_dir
+
+- name: "{{ __test_component__log_pretest_setup_test_workdir }} Reset test base dir {{ __test_component__test_base_dir }}/{{ __test_component__base_dir }}"
+  when: __test_component__git_reset_test_base_dir|d(False)|bool
+  ansible.builtin.file:
+    path: "{{ __test_component__test_base_dir }}/{{ __test_component__base_dir }}"
+    state: absent
+
+- name: "{{ __test_component__log_pretest_setup_test_workdir }} Ensure test repo BASE directories exists"
+  ansible.builtin.file:
+    path: "{{ __test_component__test_base_dir }}/{{ item }}"
+    state: directory
+    mode: "0755"
+  loop:
+    - tests
+    - "tests/{{ __test_component__collection_namespace }}"
+    - "{{ __test_component__base_dir }}"
+
+- name: "{{ __test_component__log_pretest_setup_test_workdir }} Display __test_component__reset_already_running"
+  ansible.builtin.debug:
+    var: __test_component__reset_already_running
+#    verbosity: 1
+
+- name: "{{ __test_component__log_pretest_setup_test_workdir }} Ignore {{ __test_component__test_in_progress_file }}"
+  when: __test_component__ignore_already_running|d(False)|bool or
+    __test_component__reset_already_running|d(False)|bool
+  ansible.builtin.file:
+    path: "{{ __test_component__test_base_dir }}/{{ 
+      __test_component__base_dir }}/{{ __test_component__test_in_progress_file }}"
+    state: absent
+
+- name: "{{ __test_component__log_pretest_setup_test_workdir }} Check if test already running file exists in {{ 
+    __test_component__test_base_dir }}/{{ __test_component__base_dir }}/{{ __test_component__test_in_progress_file }}"
+  no_log: true
+  ansible.builtin.stat:
+    path: "{{ __test_component__test_base_dir }}/{{ 
+      __test_component__base_dir }}/{{ __test_component__test_in_progress_file }}"
+  register: test_running_file
+
+- name: "{{ __test_component__log_pretest_setup_test_workdir }} End early if test already running file exists"
+  when: test_running_file.stat.exists|bool
+  ansible.builtin.fail:
+    msg: "test already running file exists at {{ 
+      __test_component__test_base_dir }}/{{ __test_component__base_dir }}/{{ __test_component__test_in_progress_file }}"
+
+- name: "{{ __test_component__log_pretest_setup_test_workdir }} Create {{ 
+    __test_component__test_base_dir }}/{{ __test_component__base_dir }}/{{ __test_component__test_in_progress_file }}"
+  when: __test_component__test_in_progress_file_content|d('')|length==0
+  ansible.builtin.file:
+    path: "{{ __test_component__test_base_dir }}/{{ 
+      __test_component__base_dir }}/{{ __test_component__test_in_progress_file }}"
+    state: touch
+    mode: "0644"
+
+- name: "{{ __test_component__log_pretest_setup_test_workdir }} Create {{ 
+    __test_component__test_base_dir }}/{{ __test_component__base_dir }}/{{ __test_component__test_in_progress_file }}"
+  when: __test_component__test_in_progress_file_content|d('')|length>0
+  ansible.builtin.copy:
+    dest: "{{ __test_component__test_base_dir }}/{{ 
+      __test_component__base_dir }}/{{ __test_component__test_in_progress_file }}"
+    content: "{{ __test_component__test_in_progress_file_content }}"
+    mode: "0644"
+
+- name: "{{ __test_component__log_pretest_setup_test_workdir }} Ensure test repo directories exists"
+  ansible.builtin.file:
+    path: "{{ __test_component__test_base_dir }}/{{ item }}"
+    state: directory
+    mode: "0755"
+  loop:
+    - "{{ __test_component__component_dir }}"
+    - "{{ __test_component__run_dir }}"
+    - "{{ __test_component__test_file_results_base_dir }}"
+#    - "{{ __test_component__test_file_start_dir }}"
+
+- name: "{{ __test_component__log_pretest_setup_test_workdir }} Set __test_component__git_comment"
+  ansible.builtin.set_fact:
+    __test_component__git_comment: "{{ __test_component__git_comment_prefix }} - ansible integration test: initialize test repo start data"
+
+- name: "{{ __test_component__log_pretest_setup_test_workdir }} Add/Commit/Push repo with test start data at {{ __test_component__test_base_dir }}"
+  when: __test_component__git_test_results_enabled|bool
+  dettonville.utils.git_pacp:
+    path: "{{ __test_component__test_base_dir }}"
+    branch: "{{ __test_component__git_repo_branch }}"
+    url: "{{ __test_component__git_repo_url }}"
+    comment: "{{ __test_component__git_comment }}"
+    ssh_params: "{{ __test_component__git_ssh_params }}"
+  register: __test_component__git_pacp_result
+
+- name: "{{ __test_component__log_pretest_setup_test_workdir }} Display __test_component__git_pacp_result"
+  ansible.builtin.debug:
+    var: __test_component__git_pacp_result
+    verbosity: 1

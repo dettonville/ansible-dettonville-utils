@@ -1,0 +1,7 @@
+{% if __test_filter_module_result.result is string %}
+result: |
+  {{ __test_filter_module_result.result | indent(2) }}
+{% elif (__test_filter_module_result.result is mapping or __test_filter_module_result.result is iterable) %}
+result:
+  {{ __test_filter_module_result.result | to_nice_yaml(indent=2) | indent(2) }}
+{%- endif %}

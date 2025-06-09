@@ -26,7 +26,7 @@ class Git:
         self.git_bin_path = self.module.params.get('executable') or self.module.get_bin_path('git', True)
         self.loglevel = self.module.params.get('logging_level') or _LOGLEVEL_DEFAULT
 
-        ## ref: https://www.tutorialexample.com/fix-python-logging-module-not-writing-to-file-python-tutorial/
+        # ref: https://www.tutorialexample.com/fix-python-logging-module-not-writing-to-file-python-tutorial/
         for handler in logging.root.handlers[:]:
             logging.root.removeHandler(handler)
 
@@ -45,7 +45,7 @@ class Git:
         self.repo_url = repo_config.get('repo_url')
         self.repo_scheme = repo_config.get('repo_scheme') or self.get_url_scheme(self.repo_url)
         self.repo_branch = repo_config.get('repo_branch')
-        self.module.debug('self.repo_url={0}'.format(self.repo_url))
+        self.log.debug('self.repo_url={0}'.format(self.repo_url))
 
         self.remote = repo_config.get('remote') or 'origin'
         self.push_option = repo_config.get('push_option')
@@ -240,12 +240,11 @@ fi
 
         return result
 
-    def clone(self, bare=False, reference=None, refspec=None):
+    def clone(self, shallow=True, bare=False, reference=None, refspec=None):
         ''' makes a new git repo if it does not already exist '''
         log_prefix = "%s.clone():" % self.__class__.__name__
 
-        # self.log.info('%s started' % log_prefix)
-        self.module.debug('%s started' % log_prefix)
+        self.log.debug('%s started' % log_prefix)
 
         try:
             os.makedirs(os.path.dirname(self.repo_dir))
@@ -255,6 +254,10 @@ fi
 
         # ref: https://stackoverflow.com/questions/1911109/how-do-i-clone-a-specific-git-branch
         command.extend(['--single-branch', '--branch', self.repo_branch])
+
+        # ref: https://stackoverflow.com/questions/26957237/how-to-make-git-clone-faster-with-multiple-threads#26957305
+        if shallow:
+            command.append('--depth=1')
 
         if bare:
             command.append('--bare')
@@ -268,8 +271,7 @@ fi
 
         command.extend([self.repo_url, self.repo_dir])
 
-        # self.log.info('%s command=%s' % (log_prefix, command))
-        self.module.debug('%s command=%s' % (log_prefix, command))
+        self.log.debug('%s command=%s' % (log_prefix, command))
 
         rc, output, error = self.module.run_command(command, check_rc=True, cwd=self.repo_dir)
 
@@ -288,15 +290,14 @@ fi
         else:
             FailingMessage(self.module, rc, command, output, error)
 
-        self.module.debug('%s result => %s' % (log_prefix, pprint.pformat(result)))
+        self.log.debug('%s result => %s' % (log_prefix, pprint.pformat(result)))
         return result
 
     def pull(self):
         ''' pull git repo '''
         log_prefix = "%s.pull():" % self.__class__.__name__
 
-        # self.log.info('%s started' % log_prefix)
-        self.module.debug('%s started' % log_prefix)
+        self.log.debug('%s started' % log_prefix)
 
         command = [self.git_bin_path, 'pull']
         command.extend([self.remote, self.repo_branch])
@@ -304,7 +305,7 @@ fi
         result = dict()
 
         # self.log.info('%s command=%s' % (log_prefix, command))
-        self.module.debug('%s command=%s' % (log_prefix, command))
+        self.log.debug('%s command=%s' % (log_prefix, command))
 
         rc, output, error = self.module.run_command(command, check_rc=True, cwd=self.repo_dir)
 
@@ -314,7 +315,7 @@ fi
         else:
             FailingMessage(self.module, rc, command, output, error)
 
-        self.module.debug('%s result => %s' % (log_prefix, pprint.pformat(result)))
+        self.log.debug('%s result => %s' % (log_prefix, pprint.pformat(result)))
         return result
 
     def add(self, add_files=None):
@@ -330,8 +331,7 @@ fi
         """
         log_prefix = "%s.add():" % self.__class__.__name__
 
-        # self.log.info('%s started' % log_prefix)
-        self.module.debug('%s started' % log_prefix)
+        self.log.debug('%s started' % log_prefix)
 
         if add_files is None:
             add_files = ['.']
@@ -344,7 +344,7 @@ fi
 
         result = dict()
 
-        self.module.debug('%s command => %s' % (log_prefix, command))
+        self.log.debug('%s command => %s' % (log_prefix, command))
 
         rc, output, error = self.module.run_command(command, cwd=self.repo_dir)
 
@@ -354,7 +354,7 @@ fi
         else:
             FailingMessage(self.module, rc, command, output, error)
 
-        self.module.debug('%s result => %s' % (log_prefix, pprint.pformat(result)))
+        self.log.debug('%s result => %s' % (log_prefix, pprint.pformat(result)))
 
         return result
 
@@ -373,13 +373,12 @@ fi
         """
         log_prefix = "%s.status():" % self.__class__.__name__
 
-        # self.log.info('%s started' % log_prefix)
-        self.module.debug('%s started' % log_prefix)
+        self.log.debug('%s started' % log_prefix)
 
         data = set()
         command = [self.git_bin_path, 'status', '--porcelain']
 
-        self.module.debug('%s command => %s' % (log_prefix, command))
+        self.log.debug('%s command => %s' % (log_prefix, command))
 
         rc, output, error = self.module.run_command(command, cwd=self.repo_dir)
 
@@ -408,13 +407,12 @@ fi
         """
         log_prefix = "%s.commit():" % self.__class__.__name__
 
-        # self.log.info('%s started' % log_prefix)
-        self.module.debug('%s started' % log_prefix)
+        self.log.debug('%s started' % log_prefix)
 
         result = dict()
         command = [self.git_bin_path, 'commit', '-m', comment]
 
-        self.module.debug('%s command => %s' % (log_prefix, command))
+        self.log.debug('%s command => %s' % (log_prefix, command))
 
         rc, output, error = self.module.run_command(command, cwd=self.repo_dir)
 
@@ -424,7 +422,7 @@ fi
         else:
             FailingMessage(self.module, rc, command, output, error)
 
-        self.module.debug('%s result => %s' % (log_prefix, pprint.pformat(result)))
+        self.log.debug('%s result => %s' % (log_prefix, pprint.pformat(result)))
 
         return result
 
@@ -443,8 +441,7 @@ fi
         """
         log_prefix = "%s.push():" % self.__class__.__name__
 
-        # self.log.info('%s started' % log_prefix)
-        self.module.debug('%s started' % log_prefix)
+        self.log.debug('%s started' % log_prefix)
 
         command = [self.git_bin_path, 'push', self.remote, self.repo_branch]
 

@@ -16,6 +16,6 @@ export_list:
   - { key1: "value41", key2: "value42", key3: "ﬀöø", key4: "båz" }
 
 test_expected:
-  changed: yes
-  failed: no
-  message: "The csv file has been created successfully at .*/{{ __test_file }}"
+  changed: true
+  failed: false
+  message: "The csv file has been created successfully at .*/{{ __test_component__test_file }}"

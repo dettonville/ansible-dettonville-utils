@@ -1,6 +1,10 @@
 ---
 
-test_result_output_file: yes
+## recent addition
+test_result_output_file_slurp: yes
+
+## original settings follow
+#test_result_output_file: yes
 
 test_file_format: csv
 

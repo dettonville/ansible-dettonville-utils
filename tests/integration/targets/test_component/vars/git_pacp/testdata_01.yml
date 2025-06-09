@@ -10,5 +10,5 @@ git_add: [ "." ]
 git_ssh_params: "{{ __test_component__git_ssh_params }}"
 
 test_expected:
-  changed: no
-  failed: no
+  changed: false
+  failed: false

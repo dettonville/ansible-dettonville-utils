@@ -3,8 +3,8 @@
 test_description: "dict object - empty object remove test"
 
 test_expected:
-  changed: no
-  failed: no
+  changed: false
+  failed: false
 
 key_patterns:
   - platform_id

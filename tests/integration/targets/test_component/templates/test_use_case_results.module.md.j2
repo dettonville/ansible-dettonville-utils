@@ -1,0 +1,8 @@
+
+```shell
+TASK [Run test on {{ __test_component__collection }}.{{ __test_component }}]
+TASK [Display __test_component__test_result]
+ok: [localhost] =>
+  {{ __test_component__test_result | to_nice_yaml(indent=2) | indent(2) }}
+
+```

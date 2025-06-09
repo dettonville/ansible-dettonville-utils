@@ -1,0 +1,5 @@
+---
+test_result_output_file_slurp: yes
+
+#test_result_output_file: yes
+#test_file_format: yml

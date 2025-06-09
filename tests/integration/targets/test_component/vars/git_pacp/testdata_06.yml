@@ -9,8 +9,8 @@ git_comment: "{{ __test_component__git_comment_prefix }} - SSH - remove test fil
 git_ssh_params: "{{ __test_component__git_ssh_params }}"
 
 test_expected:
-  changed: yes
-  failed: no
+  changed: true
+  failed: false
 
 test_start_data:
   - file_path: group_vars/app123.yml

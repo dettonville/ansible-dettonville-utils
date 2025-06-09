@@ -1,0 +1,29 @@
+---
+
+- name: "{{ __test_component__log_run_test }} Set __test_component__test_case_args"
+  ansible.builtin.set_fact:
+    __test_component__test_case_args: "sort_keys={{ __test_data.sort_keys }}"
+
+- name: "{{ __test_component__log_run_test }} Run test on {{ __test_component__collection }}.{{ __test_component }}"
+  ignore_errors: yes
+  ansible.builtin.set_fact:
+    __test_lookup_result: "{{ lookup('dettonville.utils.collection_version', 'ansible.utils') }}"
+  register: __test_component__test_result
+
+- name: "{{ __test_component__log_run_test }} Display __test_component__test_result"
+  ansible.builtin.debug:
+    var: __test_component__test_result
+
+- name: "{{ __test_component__log_run_test }} Display __test_lookup_result"
+  ansible.builtin.debug:
+    var: __test_lookup_result
+    verbosity: 1
+
+- name: "{{ __test_component__log_run_test }} Set __test_lookup_module_result"
+  ansible.builtin.set_fact:
+    __test_lookup_module_result:
+      result: "{{ __test_lookup_result }}"
+
+- name: "{{ __test_component__log_run_test }} Display __test_lookup_module_result"
+  ansible.builtin.debug:
+    var: __test_lookup_module_result

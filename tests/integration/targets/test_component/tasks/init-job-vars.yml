@@ -1,0 +1,48 @@
+---
+
+- name: "{{ __test_component__log_init_job_vars }} Display ansible_env"
+  ansible.builtin.debug:
+    var: ansible_env
+    verbosity: 1
+
+- name: "{{ __test_component__log_init_job_vars }} Set __test_component__job_path_awx"
+  when:
+    - ansible_env.AWX_HOST is defined
+    - tower_job_id is defined
+  ansible.builtin.set_fact:
+    __test_component__job_path_awx: "{{ ansible_env.AWX_HOST }}/#/jobs/playbook/{{ tower_job_id }}/output"
+
+- name: "{{ __test_component__log_init_job_vars }} Set __test_component__job_path_jenkins"
+  when: ansible_env.BUILD_URL is defined
+  ansible.builtin.set_fact:
+    __test_component__job_path_jenkins: "{{ ansible_env.BUILD_URL }}"
+
+- name: "{{ __test_component__log_init_job_vars }} Set __test_component__job_path_cli"
+  ansible.builtin.set_fact:
+    __test_component__job_path_cli: "{{ lookup('env', 'USER') }}:{{ lookup('env', 'PWD') }}"
+#    __test_component__job_path_cli: "{{ ansible_env.USER|d(ansible_env.USERNAME) }}@{{ ansible_hostname }}:{{ ansible_env.PWD }}"
+
+- name: "{{ __test_component__log_init_job_vars }} Display job info"
+  ansible.builtin.debug:
+    msg:
+      - "__test_component__job_path_awx={{ __test_component__job_path_awx | d('') }}"
+      - "__test_component__job_path_jenkins={{ __test_component__job_path_jenkins | d('') }}"
+      - "__test_component__job_path_cli={{ __test_component__job_path_cli | d('') }}"
+
+- name: "{{ __test_component__log_init_job_vars }} Set __test_component__job_url"
+  ansible.builtin.set_fact:
+    __test_component__job_url: "{{ test_component__test_job_url 
+      | d(__test_component__job_path_awx) 
+      | d(__test_component__job_path_jenkins)
+      | d('') }}"
+
+- name: "{{ __test_component__log_init_job_vars }} Set __test_component__job_markdown_link"
+  ansible.builtin.set_fact:
+    __test_component__job_markdown_link: "{{ '[test job link](' + __test_component__job_url + ')' 
+      if (__test_component__job_url|d('')|length>0) else __test_component__job_path_cli }}"
+
+- name: "{{ __test_component__log_init_job_vars }} Display job URL info"
+  ansible.builtin.debug:
+    msg:
+      - "__test_component__job_url={{ __test_component__job_url }}"
+      - "__test_component__job_markdown_link={{ __test_component__job_markdown_link | d('') }}"

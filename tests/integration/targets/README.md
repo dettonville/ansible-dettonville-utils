@@ -42,10 +42,10 @@ Variable value/state query based on group:
 ```shell
 $ ansible -i _test_inventory/ -m debug -a var=group_names dmz
 $ ansible -i _test_inventory/ -m debug -a var=cyberark_platform_accounts__platform_type dcc_cyberark_platform_lnx_nondomain_dmz
-testd1s1.dettonville.org | SUCCESS => {
+testd1s1.example.org | SUCCESS => {
     "cyberark_platform_accounts__platform_type": "nondomain_dmz"
 }
-testd2s1.dettonville.org | SUCCESS => {
+testd2s1.example.org | SUCCESS => {
     "cyberark_platform_accounts__platform_type": "nondomain_dmz"
 }
 
@@ -86,7 +86,7 @@ $ ansible -e @../integration_config.vault.yml -e @test-vars.yml \
     -m debug \
     -a var=test_component_cyberark_base_url \
     localhost
-$ ansible -e @test-vars.yml -e @../integration_config.vault.yml --vault-password-file ${PROJECT_DIR}/.vault_pass -i _test_inventory/ -m debug -a var=vault_platform testd1s4.dettonville.org
+$ ansible -e @test-vars.yml -e @../integration_config.vault.yml --vault-password-file ${PROJECT_DIR}/.vault_pass -i _test_inventory/ -m debug -a var=vault_platform testd1s4.example.org
 $ ansible -e @test-vars.yml -e @../integration_config.vault.yml --vault-password-file ${PROJECT_DIR}/.vault_pass -i _test_inventory/ -m debug -a var=ansible_user app_cdata_sync_sandbox
 $ ansible -e @test-vars.yml -e @../integration_config.vault.yml --vault-password-file ${PROJECT_DIR}/.vault_pass -i _test_inventory/ -m debug -a var=ansible_user app_tableau
 ```
@@ -101,12 +101,12 @@ $ ansible -e @test-vars.yml -e @vars/vault.yml --vault-password-file ${PROJECT_D
 ```shell
 $ ansible -i _test_inventory/ -m debug -a \
     var=ansible_connection,ansible_port,ansible_winrm_scheme,ansible_winrm_transport \
-    dc9.dettonville.int
+    dc9.example.int
 $ ansible -i _test_inventory/ -m debug -a var=cyberark_platform_accounts__platform_type testgroup_cyberark_dcc_9786
-winansd3s1.dettonville.int | SUCCESS => {
+winansd3s1.example.int | SUCCESS => {
     "cyberark_platform_accounts__platform_type": "managed_domain_vdi"
 }
-winansd3s4.dettonville.int | SUCCESS => {
+winansd3s4.example.int | SUCCESS => {
     "cyberark_platform_accounts__platform_type": "managed_domain_vdi"
 }
 
@@ -125,31 +125,32 @@ $ find -L test_component/vars/sort_dict_list -name "test_*.yml" | sort
 $ runme.sh -v -t sort_dict_list
 $ runme.sh -v -t export_dicts
 ## OR 
+$ run-module-tests.sh -v -t export_dicts
 $ run-module-tests.sh -v -t sort_dict_list
 ```
 
 ### Run specific test case
 
 ```shell
-$ runme.sh -v -t export_dicts --extra-vars "test_case_id_list=['10']"
-## OR
-$ run-module-tests.sh -v -t export_dicts --extra-vars "test_case_id_list=['10']"
+$ run-module-tests.sh -v -t export_dicts --extra-vars \'{\"test_case_id_list\": [\"01\"]}\'
+$ run-module-tests.sh -v -t sort_dict_list --extra-vars \'{\"test_case_id_list\": [\"02\"]}\'
+$ run-module-tests.sh -v -t export_dicts --extra-vars \'{\"test_case_id_list\": [\"01\",\"08\"]}\'
 ```
 
 ### Run role test on hosts
 
 ```shell
-$ run-role-tests.sh -v -t display-hostvars -l testd1s4.dettonville.org
-$ run-role-tests.sh -v -t display-dettonville-utils-vars -l testd1s4.dettonville.org
+$ run-role-tests.sh -v -t display-hostvars -l testd1s4.example.org
+$ run-role-tests.sh -v -t display-dettonville-utils-vars -l testd1s4.example.org
 $ run-role-tests.sh -v -t display-dettonville-utils-vars -l testgroup
-$ run-role-tests.sh -v -l winansd1s1.dettonville.int
+$ run-role-tests.sh -v -l winansd1s1.example.int
 $ run-role-tests.sh -t display-hostvars
 ```
 
 #### Run specific set of test cases
 
 ```shell
-$ run-module-tests.sh -v -t export_dicts --extra-vars "test_case_id_list=['01','02']"
+$ run-module-tests.sh -v -t export_dicts --extra-vars \'{\"test_case_id_list\": [\"01\",\"02\"]}\'
 ```
 
 #### Run test cases with regex pattern
@@ -162,10 +163,10 @@ $ run-module-tests.sh -v -t sort_dict_list
 $ run-module-tests.sh -v -t remove_dict_keys
 $ run-module-tests.sh -v -t remove_sensitive_keys
 $ run-module-tests.sh -v -t export_dicts
-$ run-module-tests.sh -v -t export_dicts --extra-vars "test_case_id_list=['10']"
-$ run-module-tests.sh -v -t sort_dict_list --extra-vars "test_case_id_list=['01']"
-$ run-module-tests.sh -v -t remove_dict_keys --extra-vars "test_case_id_list=['01']"
-$ run-module-tests.sh -v -t remove_sensitive_keys --extra-vars "test_case_id_list=['01']"
+$ run-module-tests.sh -v -t export_dicts --extra-vars \'{\"test_case_id_list\": [\"10\"]}\'
+$ run-module-tests.sh -v -t sort_dict_list --extra-vars \'{\"test_case_id_list\": [\"01\"]}\'
+$ run-module-tests.sh -v -t remove_dict_keys --extra-vars \'{\"test_case_id_list\": [\"01\"]}\'
+$ run-module-tests.sh -v -t remove_sensitive_keys --extra-vars \'{\"test_case_id_list\": [\"01\"]}\'
 $ run-module-tests.sh -v -t git_pacp
 ## To run all module tests
 $ run-module-tests.sh -v
@@ -192,11 +193,11 @@ $ run-pytest.sh export_dicts-01
 ### Run role test on hosts
 
 ```shell
-$ run-role-tests.sh -v -l testd1s1.dettonville.org
-$ run-role-tests.sh -v -l winansd1s1.dettonville.int
+$ run-role-tests.sh -v -l testd1s1.example.org
+$ run-role-tests.sh -v -l winansd1s1.example.int
 $ run-role-tests.sh -t display-hostvars
-$ run-role-tests.sh -t display-hostvars -l testd1s1.dettonville.org
-$ run-role-tests.sh -v -t display-dettonville-utils-vars -l testd1s4.dettonville.org
+$ run-role-tests.sh -t display-hostvars -l testd1s1.example.org
+$ run-role-tests.sh -v -t display-dettonville-utils-vars -l testd1s4.example.org
 ```
 
 
@@ -259,6 +260,18 @@ $ export ANSIBLE_DEBUG=1
 $ ./AnsiballZ_export_dicts.py execute
 ## OR
 $ ./AnsiballZ_export_dicts.py execute | jq
+```
+
+### Modify code and re-run until works correctly
+
+```shell
+$ cd ~/.ansible/tmp
+## NOTE:
+## below navigate to the 2nd to last instance of invocation since the module is ALSO invoked/used 
+## by the test harness itself for storing/logging the test results
+$ cd $(dirname $(find . -maxdepth 2 -name "*.py" -type f -printf "\n%TY-%Tm-%Td %AT %p" | sort -nk1 | grep test_results_logger.py | tail -2 | head -1 | cut -d' ' -f3))
+$ code .
+$ ./AnsiballZ_test_results_logger.py execute
 ```
 
 ### Debugging integration test results

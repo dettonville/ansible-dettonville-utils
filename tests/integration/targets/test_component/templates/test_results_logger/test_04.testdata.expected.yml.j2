@@ -1,0 +1,215 @@
+files:
+  test-results/junit-report.xml: |
+    <?xml version="1.0" ?>
+    <testsuites assertions="0" disabled="0" errors="0" failures="0" skipped="5" tests="7" time="0.0">
+    	<testsuite disabled="0" errors="0" failures="0" name="update_groups" skipped="3" tests="3" time="0">
+    		<testcase name="group01" classname="update_groups">
+    			<skipped type="skipped">test_suite_id:test_case_id=update_groups:group01 skipped</skipped>
+    		</testcase>
+    		<testcase name="group02" classname="update_groups">
+    			<skipped type="skipped">test_suite_id:test_case_id=update_groups:group02 skipped</skipped>
+    		</testcase>
+    		<testcase name="group03" classname="update_groups">
+    			<skipped type="skipped">test_suite_id:test_case_id=update_groups:group03 skipped</skipped>
+    		</testcase>
+    	</testsuite>
+    	<testsuite disabled="0" errors="0" failures="0" name="update_inventory" skipped="2" tests="4" time="0">
+    		<properties>
+    			<property name="test_collection_version" value="2024.6.2"/>
+    			<property name="test_component_git_branch" value="feature/AIM-2648-dettonville.inventory-module-enhancements"/>
+    			<property name="test_component_git_commit_hash" value="a29a72b"/>
+    			<property name="test_date" value="2024-06-16T01:30:10Z"/>
+    			<property name="test_description" value="Add hosts with global groups enforcement"/>
+    			<property name="test_failed" value="False"/>
+    			<property name="test_job_link" value="[test job link](https://infracicdd1s1.example.org/jenkins/job/INFRA/job/repo-test-automation/job/dettonville.utils/job/integration-tests/job/dettonville.inventory/job/run-module-tests/job/feature%252FAIM-2648-dettonville.inventory-module-enhancements/23/)"/>
+    		</properties>
+    		<testcase name="combined01" classname="update_inventory"/>
+    		<testcase name="group01" classname="update_inventory"/>
+    		<testcase name="group02" classname="update_inventory">
+    			<skipped type="skipped">test_suite_id:test_case_id=update_inventory:group02 skipped</skipped>
+    		</testcase>
+    		<testcase name="group03" classname="update_inventory">
+    			<skipped type="skipped">test_suite_id:test_case_id=update_inventory:group03 skipped</skipped>
+    		</testcase>
+    	</testsuite>
+    </testsuites>
+
+  test-results/test-logger-results.yml: |
+    !TestSuites
+    test_suites:
+      update_groups: !TestSuite
+        name: update_groups
+        test_cases:
+          group01: !TestCase
+            name: group01
+            assertions:
+            elapsed_sec:
+            timestamp:
+            classname: update_groups
+            status:
+            category:
+            file:
+            line:
+            log:
+            url:
+            stdout:
+            stderr:
+            is_enabled: true
+            properties: {}
+            errors: []
+            failures: []
+            skipped:
+            - message:
+              output: test_suite_id:test_case_id=update_groups:group01 skipped
+            allow_multiple_subelements: false
+          group02: !TestCase
+            name: group02
+            assertions:
+            elapsed_sec:
+            timestamp:
+            classname: update_groups
+            status:
+            category:
+            file:
+            line:
+            log:
+            url:
+            stdout:
+            stderr:
+            is_enabled: true
+            properties: {}
+            errors: []
+            failures: []
+            skipped:
+            - message:
+              output: test_suite_id:test_case_id=update_groups:group02 skipped
+            allow_multiple_subelements: false
+          group03: !TestCase
+            name: group03
+            assertions:
+            elapsed_sec:
+            timestamp:
+            classname: update_groups
+            status:
+            category:
+            file:
+            line:
+            log:
+            url:
+            stdout:
+            stderr:
+            is_enabled: true
+            properties: {}
+            errors: []
+            failures: []
+            skipped:
+            - message:
+              output: test_suite_id:test_case_id=update_groups:group03 skipped
+            allow_multiple_subelements: false
+        timestamp:
+        hostname:
+        id:
+        package:
+        file:
+        log:
+        url:
+        stdout:
+        stderr:
+        properties:
+      update_inventory: !TestSuite
+        name: update_inventory
+        test_cases:
+          combined01: !TestCase
+            name: combined01
+            assertions:
+            elapsed_sec:
+            timestamp:
+            classname: update_inventory
+            status:
+            category:
+            file:
+            line:
+            log:
+            url:
+            stdout:
+            stderr:
+            is_enabled: true
+            properties: {}
+            errors: []
+            failures: []
+            skipped: []
+            allow_multiple_subelements: false
+          group01: !TestCase
+            name: group01
+            assertions:
+            elapsed_sec:
+            timestamp:
+            classname: update_inventory
+            status:
+            category:
+            file:
+            line:
+            log:
+            url:
+            stdout:
+            stderr:
+            is_enabled: true
+            properties: {}
+            errors: []
+            failures: []
+            skipped: []
+            allow_multiple_subelements: false
+          group02: !TestCase
+            name: group02
+            assertions:
+            elapsed_sec:
+            timestamp:
+            classname: update_inventory
+            status:
+            category:
+            file:
+            line:
+            log:
+            url:
+            stdout:
+            stderr:
+            is_enabled: true
+            properties: {}
+            errors: []
+            failures: []
+            skipped:
+            - message:
+              output: test_suite_id:test_case_id=update_inventory:group02 skipped
+            allow_multiple_subelements: false
+          group03: !TestCase
+            name: group03
+            assertions:
+            elapsed_sec:
+            timestamp:
+            classname: update_inventory
+            status:
+            category:
+            file:
+            line:
+            log:
+            url:
+            stdout:
+            stderr:
+            is_enabled: true
+            properties: {}
+            errors: []
+            failures: []
+            skipped:
+            - message:
+              output: test_suite_id:test_case_id=update_inventory:group03 skipped
+            allow_multiple_subelements: false
+        timestamp:
+        hostname:
+        id:
+        package:
+        file:
+        log:
+        url:
+        stdout:
+        stderr:
+        properties:

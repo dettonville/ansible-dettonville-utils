@@ -1,0 +1,57 @@
+---
+
+test_description: "init test"
+
+test_expected:
+  changed: true
+  failed: false
+  message: "The test results file has been created successfully at .*"
+
+test_case_base_dir: "vars/tests"
+test_results_dir: "test-results"
+test_case_file_prefix: "testdata_"
+
+test_start_data:
+  - file_path: vars/tests/export_dicts/testdata_01.yml
+    is_raw: true
+    content: |
+      ---
+      test_description: "CSV test"
+      test_file_format: "csv"
+
+  - file_path: vars/tests/export_dicts/testdata_02.yml
+    is_raw: true
+    content: |
+      ---
+      test_description: "CSV test - empty key value"
+      test_file_format: "csv"
+
+  - file_path: vars/tests/export_dicts/testdata_03.yml
+    is_raw: true
+    content: |
+      ---
+      test_description: "CSV test - encoded string values"
+
+  - file_path: vars/tests/export_dicts/testdata_04.yml
+    is_raw: true
+    content: |
+      ---
+      test_description: "CSV test - export with specified columns"
+
+  - file_path: vars/tests/git_acp/testdata_01.yml
+    is_raw: true
+    content: |
+      ---
+      test_description: "SSH - NO-OP - expect result with changed: false"
+
+  - file_path: vars/tests/git_acp/testdata_02.yml
+    is_raw: true
+    content: |
+      ---
+      test_description: "SSH - add test file"
+
+  - file_path: vars/tests/git_acp/testdata_03.yml
+    is_raw: true
+    content: |
+      ---
+      test_description: "SSH - add test file with explicit `add` path"

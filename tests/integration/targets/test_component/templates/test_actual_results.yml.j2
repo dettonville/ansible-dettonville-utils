@@ -1,0 +1,20 @@
+files:
+{% for _actual_results_file_path in __test_component__test_results_file_contents_by_path.keys()|sort -%}
+{% set _actual_results_file_ext = _actual_results_file_path.split('.')[-1] %}
+{% set _actual_results_file = __test_component__test_results_file_contents_by_path[_actual_results_file_path] %}
+{% if __test_data.validate_yaml_content|d(__test_component__validate_yaml_content_default)|bool and _actual_results_file_ext in ['yml','yaml'] %}
+{% set _actual_results_file_content = _actual_results_file.content | b64decode | from_yaml %}
+{% if _actual_results_file_content is defined and _actual_results_file_content is not none %}
+  {{ _actual_results_file_path }}:
+    {{ _actual_results_file_content | to_nice_yaml(indent=2) | indent(4) }}
+{%- endif %}
+{% else %}
+{% set _actual_results_file_content = _actual_results_file.content | b64decode %}
+  {{ _actual_results_file_path }}: |
+    {{ _actual_results_file_content | indent(4) }}
+{% endif %}
+{% endfor %}
+{%- if __test_component__test_results_link_paths|d([])|length>0 %}
+symlinks:
+  {{ __test_component__test_results_link_paths | to_nice_yaml(indent=2) | indent(2) }}
+{%- endif %}

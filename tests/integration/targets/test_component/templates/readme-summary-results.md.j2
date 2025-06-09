@@ -1,0 +1,26 @@
+
+# Test Run Results
+
+## Summary Test Run Results
+
+- [Test Run Results](test-results.md)
+- [Test Run Results (YAML formatted)](test-results.yml)
+
+## Detailed Test Run Results
+
+- [Detailed Test Run Results](test-results.detailed.md)
+- [Detailed Test Run Results (YAML formatted)](test-results.detailed.yml)
+
+## Test/Use Case Example Index
+
+{% for _test_component, _test_component_results in __test_component__summary_results.test_components.items() %}
+### {{ __test_component__collection }}.{{ _test_component }} Examples
+
+{% if _test_component_results.test_cases is defined %}
+{% for _test_case_id in _test_component_results.test_cases.keys() | sort %}
+{% set _test_case_result = _test_component_results.test_cases[_test_case_id] %}
+- [{{ _test_case_id }}: {{ _test_case_result['test_description'] }}]({{ _test_component }}/test.results/test_{{ _test_case_id }}/{{ __test_component__use_case_example_file }})
+{% endfor %}
+
+{% endif %}
+{% endfor %}

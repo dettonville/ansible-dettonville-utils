@@ -1,0 +1,14 @@
+
+```yaml
+---
+
+- name: "Run test on {{ __test_component__collection }}.{{ __test_component }}"
+  register: __test_component__test_result
+  {{ __test_component__collection }}.{{ __test_component }}:
+    {{ __test_component__test_case_args | to_nice_yaml(indent=2) | indent(4) }}
+
+- name: "Display __test_component__test_result"
+  ansible.builtin.debug:
+    var: __test_component__test_result
+
+```

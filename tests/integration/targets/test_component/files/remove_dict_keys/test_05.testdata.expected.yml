@@ -1,38 +1,39 @@
-- address: 172.21.33.8
-  automatic_management_enabled: true
-  domain_type: local
-  platform_account_type: recon
-  platform_id: WND-Local-Managed-DMZ
-  platform_logon_domain: 172.21.33.8
-  platform_notes: WINANSD1S1.example.int
-  safe: A-T-careconlocal
-- address: 172.31.25.54
-  automatic_management_enabled: true
-  domain_type: local
-  platform_account_type: recon
-  platform_id: WND-Local-Managed-DMZ
-  platform_logon_domain: 172.31.25.54
-  platform_notes: WINANSD1S4.example.int
-  safe: A-T-careconlocal
-- address: 172.21.33.8
-  automatic_management_enabled: true
-  domain_type: local
-  groups:
-  - Administrators
-  managed: true
-  platform_account_type: platform
-  platform_id: WND-Local-Managed-DMZ
-  platform_logon_domain: 172.21.33.8
-  platform_notes: WINANSD1S1.example.int
-  safe: Windows-Server-Local-Admin
-- address: 172.31.25.54
-  automatic_management_enabled: true
-  domain_type: local
-  groups:
-  - Administrators
-  managed: true
-  platform_account_type: platform
-  platform_id: WND-Local-Managed-DMZ
-  platform_logon_domain: 172.31.25.54
-  platform_notes: WINANSD1S4.example.int
-  safe: Windows-Server-Local-Admin
+result:
+  - address: 172.21.33.8
+    automatic_management_enabled: true
+    domain_type: local
+    platform_account_type: recon
+    platform_id: WND-Local-Managed-DMZ
+    platform_logon_domain: 172.21.33.8
+    platform_notes: WINANSD1S1.example.int
+    safe: A-T-careconlocal
+  - address: 172.31.25.54
+    automatic_management_enabled: true
+    domain_type: local
+    platform_account_type: recon
+    platform_id: WND-Local-Managed-DMZ
+    platform_logon_domain: 172.31.25.54
+    platform_notes: WINANSD1S4.example.int
+    safe: A-T-careconlocal
+  - address: 172.21.33.8
+    automatic_management_enabled: true
+    domain_type: local
+    groups:
+      - Administrators
+    managed: true
+    platform_account_type: platform
+    platform_id: WND-Local-Managed-DMZ
+    platform_logon_domain: 172.21.33.8
+    platform_notes: WINANSD1S1.example.int
+    safe: Windows-Server-Local-Admin
+  - address: 172.31.25.54
+    automatic_management_enabled: true
+    domain_type: local
+    groups:
+      - Administrators
+    managed: true
+    platform_account_type: platform
+    platform_id: WND-Local-Managed-DMZ
+    platform_logon_domain: 172.31.25.54
+    platform_notes: WINANSD1S4.example.int
+    safe: Windows-Server-Local-Admin

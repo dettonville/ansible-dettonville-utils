@@ -3,12 +3,12 @@
 test_description: "empty list sort test"
 
 test_expected:
-  changed: no
-  failed: no
+  changed: false
+  failed: false
 
 sort_keys:
   - platform_id
   - address
   - username
 
-dict_list: []
+test_object: []

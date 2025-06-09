@@ -1,7 +1,9 @@
 ---
 
-- name: "{{ __test_component__log_save_test_summary }} Pull latest repo changes into {{ __test_component__test_base_dir }}"
-  when: (__test_component__git_test_results_enabled|bool) or __test_component == 'git_pacp'
+- name: "{{ __test_component__log_save_test_summary }} Pull latest repo changes into {{ 
+    __test_component__test_base_dir }}"
+#  when: (__test_component__git_test_results_enabled|bool) or __test_component == 'git_pacp'
+  when: __test_component__git_test_results_enabled|bool
   dettonville.utils.git_pacp:
     action: pull
     url: "{{ __test_component__git_repo_url }}"
@@ -11,126 +13,221 @@
   register: __test_component__git_pull_result
 
 - name: "{{ __test_component__log_save_test_summary }} Assert __test_component__report_results is defined"
-  assert:
+  ansible.builtin.assert:
     that: __test_component__report_results is defined
 
-- name: "{{ __test_component__log_save_test_summary }} Check if {{ __test_component__base_dir }}/{{ __test_report_results_file }} exists"
+- name: "{{ __test_component__log_save_test_summary }} Check if {{ 
+    __test_component__base_dir }}/{{ __test_component__report_results_file }} exists"
   no_log: true
-  stat:
-    path: "{{ __test_component__test_base_dir }}/{{ __test_component__base_dir }}/{{ __test_report_results_file }}"
+  ansible.builtin.stat:
+    path: "{{ __test_component__test_base_dir }}/{{ __test_component__base_dir }}/{{ __test_component__report_results_file }}"
   register: file_result
 
-- name: "{{ __test_component__log_save_test_summary }} Init __test_report_results with __test_component__report_results"
+- name: "{{ __test_component__log_save_test_summary 
+    }} Init __test_component__summary_results with __test_component__report_results"
   when: not file_result.stat.exists
   no_log: true
-  set_fact:
-    __test_report_results: "{{ __test_component__report_results }}"
+  ansible.builtin.set_fact:
+    __test_component__summary_results: "{{ __test_component__report_results }}"
 
-- name: "{{ __test_component__log_save_test_summary }} Get content from {{ __test_component__base_dir }}/{{ __test_report_results_file }}"
+- name: "{{ __test_component__log_save_test_summary }} Get content from {{ 
+    __test_component__base_dir }}/{{ __test_component__report_results_file }}"
   when: file_result.stat.exists
   block:
 
-  - name: "{{ __test_component__log_save_test_summary }} Read content from {{ __test_component__base_dir }}/{{ __test_report_results_file }}"
-    no_log: true
-    slurp:
-      src: "{{ __test_component__test_base_dir }}/{{ __test_component__base_dir }}/{{ __test_report_results_file }}"
-    register: __test_report_content
+    - name: "{{ __test_component__log_save_test_summary }} Read content from {{ 
+        __test_component__base_dir }}/{{ __test_component__report_results_file }}"
+      no_log: true
+      ansible.builtin.slurp:
+        src: "{{ __test_component__test_base_dir }}/{{ __test_component__base_dir }}/{{ __test_component__report_results_file }}"
+      register: __test_component__report_content
 
-  - name: "{{ __test_component__log_save_test_summary }} Set __test_report_results_file_content"
-    no_log: true
-    set_fact:
-      __test_report_results_file_content: "{{ __test_report_content.content | b64decode | from_yaml | d({}) }}"
+    - name: "{{ __test_component__log_save_test_summary }} Set __test_component__report_results_file_content"
+      no_log: true
+      ansible.builtin.set_fact:
+        __test_component__report_results_file_content: "{{ __test_component__report_content.content | b64decode | from_yaml | d({}) }}"
 
-  - name: "{{ __test_component__log_save_test_summary }} Display __test_report_results_file_content"
-    debug:
-      var: __test_report_results_file_content
-      verbosity: 2
+    - name: "{{ __test_component__log_save_test_summary }} Display __test_component__report_results_file_content"
+      ansible.builtin.debug:
+        var: __test_component__report_results_file_content
+        verbosity: 2
 
-  # TODO: clear out the key for the specific test case id so no residue of prior run remains
-  - name: "{{ __test_component__log_save_test_summary }} Merge __test_component__report_results into __test_report_results_file_content"
-    no_log: true
-    set_fact:
-      __test_report_results: "{{ __test_report_results_file_content.test_results 
-        | combine(__test_component__report_results, recursive=True) }}"
+    - name: "{{ __test_component__log_save_test_summary }} Init __test_component__summary_results_prior"
+      no_log: true
+      ansible.builtin.set_fact:
+        __test_component__summary_results_prior: "{{ __test_component__report_results_file_content.test_results | d({}) }}"
 
-- name: "{{ __test_component__log_save_test_summary }} Check if {{ __test_component__base_dir }}/{{ __test_report_results_detailed_file }} exists"
+    - name: "{{ __test_component__log_save_test_summary }} Display __test_component__summary_results_prior"
+      ansible.builtin.debug:
+        var: __test_component__summary_results_prior
+        verbosity: 2
+
+    - name: "{{ __test_component__log_save_test_summary }} Display __test_component__report_results"
+      ansible.builtin.debug:
+        var: __test_component__report_results
+        verbosity: 1
+
+    - name: "{{ __test_component__log_save_test_summary }} Set __test_component__summary_results"
+      ansible.builtin.set_fact:
+        __test_component__summary_results: |
+          {% set _test_run_components = {} %}
+          {%- set _test_run_results = __test_component__summary_results_prior %}
+          {%- set _test_run_components = _test_run_results.test_components|d({}) %}
+          {%- for _test_component, _test_run_component_results in __test_component__report_results.test_components.items() %}
+            {%- set _test_run_component = _test_run_components[_test_component]|d({}) %}
+            {%- for key, value in _test_run_component_results.items() %}
+            {%- if key not in ['test_cases'] %}
+              {%- set _ = _test_run_component.update({ key: value }) %}
+            {%- endif %}
+            {%- endfor %}
+            {%- set _test_run_cases_results = {} %}
+            {%- for _test_case_id, _test_case_result in _test_run_component_results.test_cases.items() %}
+              {%- set _ = _test_run_cases_results.update({ _test_case_id: _test_case_result }) %}
+              {%- if (_test_case_result.test_failed) %}
+                {%- set _ = _test_run_results.update({'test_failed': True }) %}
+              {%- endif %}
+            {%- endfor %}
+            {%- if _test_run_cases_results|length>0 %}
+              {%- set _ = _test_run_component.update({ 'test_cases': _test_run_cases_results }) %}
+              {%- set _ = _test_run_components.update({ _test_component: _test_run_component }) %}
+            {%- endif %}
+          {%- endfor %}
+          {%- set _ = _test_run_results.update({ 'test_components': _test_run_components }) %}
+          {{ _test_run_results | to_json | from_json }}
+
+    - name: "{{ __test_component__log_save_test_summary }} Display __test_component__summary_results"
+      ansible.builtin.debug:
+        var: __test_component__summary_results
+        verbosity: 1
+
+- name: "{{ __test_component__log_save_test_summary }} Check if {{ 
+    __test_component__base_dir }}/{{ __test_component__report_results_detailed_file }} exists"
   no_log: true
-  stat:
-    path: "{{ __test_component__test_base_dir }}/{{ __test_component__base_dir }}/{{ __test_report_results_detailed_file }}"
+  ansible.builtin.stat:
+    path: "{{ __test_component__test_base_dir }}/{{ 
+      __test_component__base_dir }}/{{ __test_component__report_results_detailed_file }}"
   register: file_detailed_result
 
-- name: "{{ __test_component__log_save_test_summary }} Init __test_report_results_detailed with __test_component__report_results_detailed"
+- name: "{{ __test_component__log_save_test_summary 
+    }} Init __test_component__report_results_detailed with __test_component__report_results_detailed"
   when: not file_detailed_result.stat.exists
   no_log: true
-  set_fact:
-    __test_report_results_detailed: "{{ __test_component__report_results_detailed }}"
+  ansible.builtin.set_fact:
+    __test_component__report_results_detailed: "{{ __test_component__report_results_detailed }}"
 
-- name: "{{ __test_component__log_save_test_summary }} Get content from {{ __test_component__base_dir }}/{{ __test_report_results_detailed_file }}"
+- name: "{{ __test_component__log_save_test_summary }} Get content from {{ 
+    __test_component__base_dir }}/{{ __test_component__report_results_detailed_file }}"
   when: file_detailed_result.stat.exists
   block:
 
-  - name: "{{ __test_component__log_save_test_summary }} Read content from {{ __test_component__base_dir }}/{{ __test_report_results_detailed_file }}"
-    no_log: true
-    slurp:
-      src: "{{ __test_component__test_base_dir }}/{{ __test_component__base_dir }}/{{ __test_report_results_detailed_file }}"
-    register: __test_report_content_detailed
+    - name: "{{ __test_component__log_save_test_summary }} Read content from {{ 
+        __test_component__base_dir }}/{{ __test_component__report_results_detailed_file }}"
+      no_log: true
+      ansible.builtin.slurp:
+        src: "{{ __test_component__test_base_dir }}/{{ 
+          __test_component__base_dir }}/{{ __test_component__report_results_detailed_file }}"
+      register: __test_component__report_content_detailed
 
-  - name: "{{ __test_component__log_save_test_summary }} Set __test_report_results_file_content_detailed"
-    no_log: true
-    set_fact:
-      __test_report_results_file_content_detailed: "{{ __test_report_content_detailed.content | b64decode | from_yaml | d({}) }}"
+    - name: "{{ __test_component__log_save_test_summary }} Set __test_component__report_results_file_content_detailed"
+      no_log: true
+      ansible.builtin.set_fact:
+        __test_component__report_results_file_content_detailed: "{{ 
+          __test_component__report_content_detailed.content | b64decode | from_yaml | d({}) }}"
 
-  - name: "{{ __test_component__log_save_test_summary }} Display __test_report_results_file_content_detailed"
-    debug:
-      var: __test_report_results_file_content_detailed
-      verbosity: 3
+    - name: "{{ __test_component__log_save_test_summary }} Display __test_component__report_results_file_content_detailed"
+      ansible.builtin.debug:
+        var: __test_component__report_results_file_content_detailed
+        verbosity: 3
 
-  - name: "{{ __test_component__log_save_test_summary }} Merge __test_component__report_results_detailed into __test_report_results_file_content_detailed"
-    no_log: true
-    set_fact:
-      __test_report_results_detailed: "{{ __test_report_results_file_content_detailed.test_results 
-        | combine(__test_component__report_results_detailed, recursive=True) }}"
+    - name: "{{ __test_component__log_save_test_summary }} Init __test_component__summary_results_detailed_prior"
+      no_log: true
+      ansible.builtin.set_fact:
+        __test_component__summary_results_detailed_prior: "{{ 
+          __test_component__report_results_file_content_detailed.test_results | d({}) }}"
 
-- name: "{{ __test_component__log_save_test_summary }} Display __test_report_results[0]"
-  debug:
-    var: __test_report_results
+    - name: "{{ __test_component__log_save_test_summary }} Display __test_component__summary_results_detailed_prior"
+      ansible.builtin.debug:
+        var: __test_component__summary_results_detailed_prior
+        verbosity: 2
+
+    - name: "{{ __test_component__log_save_test_summary }} Display __test_component__report_results_detailed"
+      ansible.builtin.debug:
+        var: __test_component__report_results_detailed
+        verbosity: 2
+
+    - name: "{{ __test_component__log_save_test_summary }} Set __test_component__summary_results_detailed"
+      no_log: true
+      ansible.builtin.set_fact:
+        __test_component__summary_results_detailed: |
+          {% set _test_run_components = {} %}
+          {%- set _test_run_results = __test_component__summary_results_detailed_prior %}
+          {%- set _test_run_components = _test_run_results.test_components|d({}) %}
+          {%- for _test_component, _test_run_component_results in __test_component__report_results_detailed.test_components.items() %}
+            {%- set _test_run_component = _test_run_components[_test_component]|d({}) %}
+            {%- for key, value in _test_run_component_results.items() %}
+            {%- if key != 'test_cases' %}
+              {%- set _ = _test_run_component.update({ key: value }) %}
+            {%- endif %}
+            {%- endfor %}
+            {%- set _test_run_cases_results = {} %}
+            {%- for _test_case_id, _test_case_result in _test_run_component_results.test_cases.items() %}
+              {%- set _ = _test_run_cases_results.update({ _test_case_id: _test_case_result }) %}
+              {%- if (_test_case_result.test_failed) %}
+                {%- set _ = _test_run_results.update({'test_failed': True }) %}
+              {%- endif %}
+            {%- endfor %}
+            {%- if _test_run_cases_results|length>0 %}
+              {%- set _ = _test_run_component.update({ 'test_cases': _test_run_cases_results }) %}
+              {%- set _ = _test_run_components.update({ _test_component: _test_run_component }) %}
+            {%- endif %}
+          {%- endfor %}
+          {%- set _ = _test_run_results.update({ 'test_components': _test_run_components }) %}
+          {{ _test_run_results | to_json | from_json }}
+
+- name: "{{ __test_component__log_save_test_summary }} Display __test_component__summary_results[0]"
+  ansible.builtin.debug:
+    var: __test_component__summary_results
     verbosity: 1
 
-- name: "{{ __test_component__log_save_test_summary }} Flatten results to __test_report_summary_results_flattened"
+- name: "{{ __test_component__log_save_test_summary 
+    }} Flatten results to __test_component__report_summary_results_flattened"
   no_log: true
-  set_fact:
-    __test_report_summary_results_flattened: "{{ _test_results|from_yaml }}"
+  ansible.builtin.set_fact:
+    __test_component__report_summary_results_flattened: "{{ _test_results|from_yaml }}"
   vars:
     _test_results: |-
-      {% for _test_component, _test_component_results in __test_report_results.test_components.items() %}
-      {% if _test_component_results['testcases'] is mapping %}
+      {% for _test_component, _test_component_results in __test_component__summary_results.test_components.items() %}
+      {% set _test_component_properties = _test_component_results.properties|d({}) %}
+      {% if _test_component_results['test_cases'] is mapping %}
       - {
-          'test_case_count': "{{ _test_component_results['testcases'].keys() | length }}",
+          'test_case_count': "{{ _test_component_results['test_cases'].keys() | length }}",
           'test_details_link': "[test details](./{{ _test_component }}/test.results/test-results.md)",
+          'test_job_link': "{{ _test_component_properties['test_job_link'] | d(__test_component__job_markdown_link) }}",
           'test_collection': "{{ __test_component__collection }}",
-          'test_collection_version': "{{ __test_component__collection_version }}",
+          'test_collection_version': "{{ _test_component_properties['test_collection_version'] | d(__test_component__collection_version) }}",
           'test_component': "{{ _test_component }}",
-          'test_date': "{{ _test_component_results['test_date'] }}",
-          'test_failed': "{{ _test_component_results['test_failed'] }}"
+          'test_date': "{{ _test_component_properties['test_date'] | d(_test_component_results['test_date']) | d(ansible_date_time.iso8601) }}",
+          'test_component_git_commit_hash': "{{ _test_component_properties['test_component_git_commit_hash'] | d(__test_component__git_commit_hash_short) }}",
+          'test_failed': "{{ _test_component_properties['test_failed'] | d(_test_component_results['test_failed']) | d() }}"
          }
       {% endif %}
       {% endfor %}
 
-- name: "{{ __test_component__log_save_test_summary }} Display __test_report_summary_results_flattened"
-  debug:
-    var: __test_report_summary_results_flattened
-    verbosity: 1
+- name: "{{ __test_component__log_save_test_summary }} Display __test_component__report_summary_results_flattened"
+  ansible.builtin.debug:
+    var: __test_component__report_summary_results_flattened
+    verbosity: 2
 
-- name: "{{ __test_component__log_save_test_summary }} Flatten results to __test_report_results_flattened"
+- name: "{{ __test_component__log_save_test_summary }} Flatten results to __test_component__report_results_flattened"
   no_log: true
-  set_fact:
-    __test_report_results_flattened: "{{ _test_results|from_yaml }}"
+  ansible.builtin.set_fact:
+    __test_component__report_results_flattened: "{{ _test_results|from_yaml }}"
   vars:
     _test_results: |-
       {% set test_item_count = [] %}
-      {% for _test_component, _test_component_results in __test_report_results.test_components.items() %}
-      {% if _test_component_results['testcases'] is mapping %}
-      {% for _test_case_id, _test_case_results in _test_component_results.testcases.items() %}
+      {% for _test_component, _test_component_results in __test_component__summary_results.test_components.items() %}
+      {% if _test_component_results['test_cases'] is mapping %}
+      {% for _test_case_id, _test_case_results in _test_component_results.test_cases.items() %}
       {% if _test_case_results is mapping %}
       {% set __ = test_item_count.append(1) %}
       - {
@@ -150,101 +247,208 @@
       {% endif %}
       {% endfor %}
 
-- name: "{{ __test_component__log_save_test_summary }} Display __test_report_results_flattened"
-  debug:
-    var: __test_report_results_flattened
-    verbosity: 1
+- name: "{{ __test_component__log_save_test_summary }} Display __test_component__report_results_flattened"
+  ansible.builtin.debug:
+    var: __test_component__report_results_flattened
+    verbosity: 2
 
 - name: "{{ __test_component__log_save_test_summary }} Initialize __test_failed"
-  set_fact:
-    __test_count: "{{ __test_report_results_flattened | length }}"
+  ansible.builtin.set_fact:
+    __test_count: "{{ __test_component__report_results_flattened | length }}"
     __test_failed: False
     __test_failed_count: 0
 
 - name: "{{ __test_component__log_save_test_summary }} Set __test_failed"
   when: item.test_failed|d(False)|bool
   no_log: true
-  set_fact:
+  ansible.builtin.set_fact:
     __test_failed: True
     __test_failed_count: "{{ __test_failed_count|int + 1 }}"
-  loop: "{{ __test_report_results_flattened }}"
+  loop: "{{ __test_component__report_results_flattened }}"
   loop_control:
     label: "{{ item.test_case_id }}"
 
 - name: "{{ __test_component__log_save_test_summary }} Display __test_failed"
-  debug:
+  ansible.builtin.debug:
     var: __test_failed
 
 - name: "{{ __test_component__log_save_test_summary }} Display __test_count"
-  debug:
+  ansible.builtin.debug:
     var: __test_count
 
 - name: "{{ __test_component__log_save_test_summary }} Display __test_failed_count"
-  debug:
+  ansible.builtin.debug:
     var: __test_failed_count
 
 - name: "{{ __test_component__log_save_test_summary }} Set __test_component__info"
-  set_fact:
+  ansible.builtin.set_fact:
     __test_results_info:
+      test_collection_version: "{{ __test_component__collection_version }}"
       test_failed: "{{ __test_failed }}"
       test_date: "{{ ansible_date_time.iso8601 }}"
       test_count: "{{ __test_count }}"
       test_failed_count: "{{ __test_failed_count }}"
 
-- name: "{{ __test_component__log_save_test_summary }} Display __test_report_results[1]"
-  debug:
-    var: __test_report_results
+- name: "{{ __test_component__log_save_test_summary }} Display __test_component__summary_results[1]"
+  ansible.builtin.debug:
+    var: __test_component__summary_results
     verbosity: 2
 
-- name: "{{ __test_component__log_save_test_summary }} Add test status to __test_report_results"
+- name: "{{ __test_component__log_save_test_summary }} Add test status to __test_component__summary_results"
   no_log: true
-  set_fact:
-    __test_report_results: "{{ __test_report_results|d({})
+  ansible.builtin.set_fact:
+    __test_component__summary_results: "{{ __test_component__summary_results|d({})
       | combine( __test_results_info, recursive=True ) }}"
-    __test_report_results_detailed: "{{ __test_report_results_detailed|d({})
+    __test_component__summary_results_detailed: "{{ __test_component__summary_results_detailed|d({})
       | combine( __test_results_info, recursive=True ) }}"
 
-- name: "{{ __test_component__log_save_test_summary }} Display __test_report_results"
-  debug:
-    var: __test_report_results
+- name: "{{ __test_component__log_save_test_summary }} Display __test_component__summary_results"
+  ansible.builtin.debug:
+    var: __test_component__summary_results
     verbosity: 1
 
-- name: "{{ __test_component__log_save_test_summary }} Save test report results to {{ __test_component__base_dir }}/{{ __test_report_results_file }}"
-  copy:
-    content: "{{ {'test_results': __test_report_results} | to_nice_yaml(indent=2) }}"
-    dest: "{{ __test_component__test_base_dir }}/{{ __test_component__base_dir }}/{{ __test_report_results_file }}"
+- name: "{{ __test_component__log_save_test_summary }} Save test report results to {{ 
+    __test_component__base_dir }}/{{ __test_component__report_results_file }}"
+  ansible.builtin.copy:
+    content: "{{ {'test_results': __test_component__summary_results} | to_nice_yaml(indent=2) }}"
+    dest: "{{ __test_component__test_base_dir }}/{{ __test_component__base_dir }}/{{ __test_component__report_results_file }}"
+    mode: "0644"
 
-- name: "{{ __test_component__log_save_test_summary }} Save test report detailed results to {{ __test_component__base_dir }}/{{ __test_report_results_detailed_file }}"
-  copy:
-    content: "{{ {'test_results': __test_report_results_detailed} | to_nice_yaml(indent=2) }}"
-    dest: "{{ __test_component__test_base_dir }}/{{ __test_component__base_dir }}/{{ __test_report_results_detailed_file }}"
+- name: "{{ __test_component__log_save_test_summary }} Save test report detailed results to {{ 
+    __test_component__base_dir }}/{{ __test_component__report_results_detailed_file }}"
+  ansible.builtin.copy:
+    content: "{{ {'test_results': __test_component__summary_results_detailed} | to_nice_yaml(indent=2) }}"
+    dest: "{{ __test_component__test_base_dir }}/{{ 
+      __test_component__base_dir }}/{{ __test_component__report_results_detailed_file }}"
+    mode: "0644"
 
-- name: "{{ __test_component__log_save_test_summary }} Save __test_report_results_flattened to {{ __test_component__base_dir }}/{{ __test_report_summary_detailed_results_csv }}"
+- name: "{{ __test_component__log_save_test_summary }} Save __test_component__report_results_flattened to {{ 
+    __test_component__base_dir }}/{{ __test_component__report_summary_detailed_results_csv }}"
   ignore_errors: yes
   dettonville.utils.export_dicts:
-    export_list: "{{ __test_report_results_flattened | dettonville.utils.sort_dict_list('test_component') }}"
+    export_list: "{{ __test_component__report_results_flattened | dettonville.utils.sort_dict_list('test_component') }}"
     columns: "{{ __test_component__report_columns }}"
-    file: "{{ __test_component__test_base_dir }}/{{ __test_component__base_dir }}/{{ __test_report_summary_detailed_results_csv }}"
+    file: "{{ __test_component__test_base_dir }}/{{ 
+      __test_component__base_dir }}/{{ __test_component__report_summary_detailed_results_csv }}"
     format: "csv"
 
-- name: "{{ __test_component__log_save_test_summary }} Save __test_report_results_flattened to {{ __test_component__base_dir }}/{{ __test_report_summary_detailed_results_md }}"
+- name: "{{ __test_component__log_save_test_summary }} Save __test_component__report_results_flattened to {{ 
+    __test_component__base_dir }}/{{ __test_component__report_summary_detailed_results_md }}"
   ignore_errors: yes
   dettonville.utils.export_dicts:
-    export_list: "{{ __test_report_results_flattened | dettonville.utils.sort_dict_list('test_component') }}"
+    export_list: "{{ __test_component__report_results_flattened | dettonville.utils.sort_dict_list('test_component') }}"
     columns: "{{ __test_component__report_columns }}"
-    file: "{{ __test_component__test_base_dir }}/{{ __test_component__base_dir }}/{{ __test_report_summary_detailed_results_md }}"
+    file: "{{ __test_component__test_base_dir }}/{{ 
+      __test_component__base_dir }}/{{ __test_component__report_summary_detailed_results_md }}"
     format: "md"
 
-- name: "{{ __test_component__log_save_test_summary }} Save __test_report_summary_results_flattened to {{ __test_component__base_dir }}/{{ __test_report_summary_results_md }}"
+- name: "{{ __test_component__log_save_test_summary }} Save __test_component__report_summary_results_flattened to {{ 
+    __test_component__base_dir }}/{{ __test_component__report_summary_results_md }}"
   ignore_errors: yes
   dettonville.utils.export_dicts:
-    export_list: "{{ __test_report_summary_results_flattened | dettonville.utils.sort_dict_list('test_component') }}"
+    export_list: "{{ __test_component__report_summary_results_flattened | dettonville.utils.sort_dict_list('test_component') }}"
     columns: "{{ __test_component__summary_report_columns }}"
-    file: "{{ __test_component__test_base_dir }}/{{ __test_component__base_dir }}/{{ __test_report_summary_results_md }}"
+    file: "{{ __test_component__test_base_dir }}/{{ 
+      __test_component__base_dir }}/{{ __test_component__report_summary_results_md }}"
     format: "md"
+
+- name: "{{ __test_component__log_save_test_summary }} Set __test_run_results"
+  ansible.builtin.set_fact:
+    __test_run_results: |
+      {% set _test_run_components = {} %}
+      {%- set _test_run_results = {} %}
+      {%- set _ = _test_run_results.update({'test_failed': False }) %}
+      {%- for _test_component, _test_run_component_results in __test_component__summary_results.test_components.items() %}
+        {%- if (ansible_run_tags|d(['all']) == ['all']) or (_test_component in ansible_run_tags) %}
+          {%- set _test_run_cases_results = {} %}
+          {%- for _test_case_id in __test_component__test_case_id_run_list %}
+            {%- if _test_run_component_results.test_cases[_test_case_id] is defined %}
+              {%- set _test_case_result = _test_run_component_results.test_cases[_test_case_id] %}
+              {%- if (test_case_id_list|d([])|length == 0) or (_test_case_id in __test_component__test_case_id_run_list|d([])) %}
+                {%- set _ = _test_run_cases_results.update({ _test_case_id: _test_case_result }) %}
+                {%- if (_test_case_result.test_failed) %}
+                  {%- set _ = _test_run_results.update({'test_failed': True }) %}
+                {%- endif %}
+              {%- endif %}
+            {%- endif %}
+          {%- endfor %}
+          {%- if _test_run_cases_results|length>0 %}
+            {%- set _ = _test_run_components.update({ _test_component: { 'test_cases': _test_run_cases_results } }) %}
+          {%- endif %}
+        {%- endif %}
+      {%- endfor %}
+      {%- set _ = _test_run_results.update({ 'test_components': _test_run_components }) %}
+      {{ _test_run_results | to_json | from_json }}
+
+- name: "{{ __test_component__log_save_test_summary }} Display __test_run_results"
+  ansible.builtin.debug:
+    var: __test_run_results
+    verbosity: 1
+
+- name: "{{ __test_component__log_save_test_summary }} Save test run report results to {{ 
+    __test_component__test_base_dir }}/{{ __test_component__last_run_results_file }}"
+  ansible.builtin.copy:
+    content: "{{ {'last_run_test_results': __test_run_results} | to_nice_yaml(indent=2) }}"
+    dest: "{{ __test_component__test_base_dir }}/{{ 
+      __test_component__base_dir }}/{{ __test_component__last_run_results_file }}"
+    mode: "0644"
+
+- name: "{{ __test_component__log_save_test_summary }} Set __test_junit_results"
+  ansible.builtin.set_fact:
+    __test_junit_results: |
+      {% set _test_suites = {} %}
+      {%- set _test_suite_results = {} %}
+      {%- for _test_suite_id, _test_run_component_results in __test_run_results.test_components.items() %}
+        {%- set _test_suite_results = {} %}
+        {%- set _test_case_results = {} %}
+        {%- for _test_case_id, _test_case in _test_run_component_results.test_cases.items() %}
+          {%- set _test_case_result = {} %}
+          {%- set _test_case_data = _test_run_component_results.test_cases[_test_case_id] %}
+          {%- set _ = _test_case_result.update({ 'properties': _test_case }) %}
+          {%- set _ = _test_case_results.update({ _test_case_id: _test_case_result }) %}
+        {%- endfor %}
+        {%- set _ = _test_suite_results.update({ 'test_cases': _test_case_results }) %}
+        {%- set _ = _test_suites.update({ _test_suite_id: _test_suite_results }) %}
+      {%- endfor %}
+      {%- set _ = _test_suite_results.update({ 'test_suites': _test_suites }) %}
+      {{ _test_suite_results | to_json | from_json }}
+
+- name: "{{ __test_component__log_save_test_summary }} Display __test_junit_results"
+  ansible.builtin.debug:
+    var: __test_junit_results
+
+- name: "{{ __test_component__log_save_test_summary }} Update test logger report for {{ 
+    __test_component__junit_report_file }}"
+  dettonville.utils.test_results_logger:
+    test_results_dir: "{{ __test_component__junit_report_dir }}"
+    test_junit_report_file: "{{ __test_component__junit_report_file }}"
+    test_case_base_dir: "{{ role_path }}/{{ __test_component__test_vars_dir }}"
+    test_case_file_prefix: "testdata_"
+    test_results: "{{ __test_junit_results }}"
+  register: __test_component__test_logger_result
+
+- name: "{{ __test_component__log_save_test_summary }} Display __test_component__test_logger_result"
+  ansible.builtin.debug:
+    var: __test_component__test_logger_result
+
+- name: "{{ __test_component__log_save_test_summary }} Save summary README.md to {{ 
+    __test_component__test_base_dir }}/{{ __test_component__base_dir }}/README.md"
+  ansible.builtin.template:
+    src: "readme-summary-results.md.j2"
+    dest: "{{ __test_component__test_base_dir }}/{{ __test_component__base_dir }}/README.md"
+    mode: "0644"
+
+- name: "{{ __test_component__log_save_test_summary }} Remove test in progress file at {{ __test_component__test_base_dir }}/{{ __test_component__base_dir }}/{{ __test_component__test_in_progress_file }}"
+  ansible.builtin.file:
+    path: "{{ __test_component__test_base_dir }}/{{ __test_component__base_dir }}/{{ __test_component__test_in_progress_file }}"
+    state: absent
+
+- name: "{{ __test_component__log_save_test_summary }} Set __test_component__git_comment"
+  ansible.builtin.set_fact:
+    __test_component__git_comment: "{{ __test_component__git_comment_prefix }} - update test summary reports"
 
 - name: "{{ __test_component__log_save_test_summary }} Display __test_component__git_comment"
-  debug:
+  ansible.builtin.debug:
     var: __test_component__git_comment
 
 - name: "{{ __test_component__log_save_test_summary }} Git ACP update save test results"

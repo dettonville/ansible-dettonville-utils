@@ -1,0 +1,31 @@
+{% if __test_component__test_case_args|d('')|length>0 %}
+{% set _filter_command = '{{ test_object | ' + __test_component__collection + '.' + __test_component + '(' + __test_component__test_case_args + ') }}' %}
+{% else %}
+{% set _filter_command = '{{ test_object | ' + __test_component__collection + '.' + __test_component + ' }}' %}
+{% endif %}
+
+```yaml
+---
+
+- name: "Set test_object"
+  ignore_errors: yes
+  ansible.builtin.set_fact:
+    test_object: 
+      {{ __test_data.test_object | to_nice_yaml(indent=2) | indent(6) }}
+
+- name: "Run test on {{ __test_component__collection }}.{{ __test_component }}"
+  ignore_errors: yes
+  ansible.builtin.set_fact:
+    __test_filter_result: "{{ _filter_command }}"
+  register: __test_component__test_result
+
+- name: "Display __test_component__test_result"
+  ansible.builtin.debug:
+    var: __test_component__test_result
+
+- name: "Display __test_filter_result"
+  ansible.builtin.debug:
+    var: __test_filter_result
+    verbosity: 1
+
+```

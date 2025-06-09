@@ -1,0 +1,32 @@
+---
+
+- name: "{{ __test_component__log_run_test }} Set __test_component__test_case_args"
+  when: __test_data.column_list is defined
+  ansible.builtin.set_fact:
+    __test_component__test_case_args: "column_list={{ __test_data.column_list }}"
+
+- name: "{{ __test_component__log_run_test }} Run test with columns on {{ 
+    __test_component__collection }}.{{ __test_component }}"
+  ignore_errors: yes
+  ansible.builtin.set_fact:
+    __test_filter_result: "{{ __test_data.test_object 
+      | dettonville.utils.to_markdown(column_list=__test_data.column_list|d([])) }}"
+  register: __test_component__test_result
+
+- name: "{{ __test_component__log_run_test }} Display __test_component__test_result"
+  ansible.builtin.debug:
+    var: __test_component__test_result
+
+- name: "{{ __test_component__log_run_test }} Display __test_filter_result"
+  ansible.builtin.debug:
+    var: __test_filter_result
+    verbosity: 1
+
+- name: "{{ __test_component__log_run_test }} Set __test_filter_module_result"
+  ansible.builtin.set_fact:
+    __test_filter_module_result:
+      result: "{{ __test_filter_result }}"
+
+- name: "{{ __test_component__log_run_test }} Display __test_filter_module_result"
+  ansible.builtin.debug:
+    var: __test_filter_module_result

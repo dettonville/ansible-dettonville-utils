@@ -46,50 +46,50 @@ EXAMPLES = '''
     msg: "{{ my_list | dettonville.utils.sort_dict_list(['platform_id','address','username']) }}"
   vars:
     my_list:
-    - address: 172.31.25.54
-      automatic_management_enabled: true
-      domain_type: local
-      platform_account_type: recon
-      platform_id: WND-Local-Managed-DMZ
-      platform_logon_domain: 172.31.25.54
-      platform_notes: WINANSD1S4.dettonville.int
-      safe: A-T-careconlocal
-      username: careconlocal
-    - address: 172.31.25.54
-      automatic_management_enabled: true
-      domain_type: local
-      groups:
-      - Administrators
-      local_admin_username: administrator
-      managed: true
-      platform_account_type: platform
-      platform_id: WND-Local-Managed-DMZ
-      platform_logon_domain: 172.31.25.54
-      platform_notes: WINANSD1S4.dettonville.int
-      safe: Windows-Server-Local-Admin
-      username: administrator
-    - address: 172.21.33.8
-      automatic_management_enabled: true
-      domain_type: local
-      platform_account_type: recon
-      platform_id: WND-Local-Managed-DMZ
-      platform_logon_domain: 172.21.33.8
-      platform_notes: WINANSD1S1.dettonville.int
-      safe: A-T-careconlocal
-      username: careconlocal
-    - address: 172.21.33.8
-      automatic_management_enabled: true
-      domain_type: local
-      groups:
-      - Administrators
-      local_admin_username: administrator
-      managed: true
-      platform_account_type: platform
-      platform_id: WND-Local-Managed-DMZ
-      platform_logon_domain: 172.21.33.8
-      platform_notes: WINANSD1S1.dettonville.int
-      safe: Windows-Server-Local-Admin
-      username: administrator
+      - address: 172.31.25.54
+        automatic_management_enabled: true
+        domain_type: local
+        platform_account_type: recon
+        platform_id: WND-Local-Managed-DMZ
+        platform_logon_domain: 172.31.25.54
+        platform_notes: WINANSD1S4.example.int
+        safe: A-T-careconlocal
+        username: careconlocal
+      - address: 172.31.25.54
+        automatic_management_enabled: true
+        domain_type: local
+        groups:
+          - Administrators
+        local_admin_username: administrator
+        managed: true
+        platform_account_type: platform
+        platform_id: WND-Local-Managed-DMZ
+        platform_logon_domain: 172.31.25.54
+        platform_notes: WINANSD1S4.example.int
+        safe: Windows-Server-Local-Admin
+        username: administrator
+      - address: 172.21.33.8
+        automatic_management_enabled: true
+        domain_type: local
+        platform_account_type: recon
+        platform_id: WND-Local-Managed-DMZ
+        platform_logon_domain: 172.21.33.8
+        platform_notes: WINANSD1S1.example.int
+        safe: A-T-careconlocal
+        username: careconlocal
+      - address: 172.21.33.8
+        automatic_management_enabled: true
+        domain_type: local
+        groups:
+          - Administrators
+        local_admin_username: administrator
+        managed: true
+        platform_account_type: platform
+        platform_id: WND-Local-Managed-DMZ
+        platform_logon_domain: 172.21.33.8
+        platform_notes: WINANSD1S1.example.int
+        safe: Windows-Server-Local-Admin
+        username: administrator
   # Produces the sorted list:
   # 
   #  my_list:
@@ -103,7 +103,7 @@ EXAMPLES = '''
   #     platform_account_type: platform
   #     platform_id: WND-Local-Managed-DMZ
   #     platform_logon_domain: 172.21.33.8
-  #     platform_notes: WINANSD1S1.dettonville.int
+  #     platform_notes: WINANSD1S1.example.int
   #     safe: Windows-Server-Local-Admin
   #     username: administrator
   #   - address: 172.21.33.8
@@ -112,7 +112,7 @@ EXAMPLES = '''
   #     platform_account_type: recon
   #     platform_id: WND-Local-Managed-DMZ
   #     platform_logon_domain: 172.21.33.8
-  #     platform_notes: WINANSD1S1.dettonville.int
+  #     platform_notes: WINANSD1S1.example.int
   #     safe: A-T-careconlocal
   #     username: careconlocal
   #   - address: 172.31.25.54
@@ -125,7 +125,7 @@ EXAMPLES = '''
   #     platform_account_type: platform
   #     platform_id: WND-Local-Managed-DMZ
   #     platform_logon_domain: 172.31.25.54
-  #     platform_notes: WINANSD1S4.dettonville.int
+  #     platform_notes: WINANSD1S4.example.int
   #     safe: Windows-Server-Local-Admin
   #     username: administrator
   #   - address: 172.31.25.54
@@ -134,7 +134,7 @@ EXAMPLES = '''
   #     platform_account_type: recon
   #     platform_id: WND-Local-Managed-DMZ
   #     platform_logon_domain: 172.31.25.54
-  #     platform_notes: WINANSD1S4.dettonville.int
+  #     platform_notes: WINANSD1S4.example.int
   #     safe: A-T-careconlocal
   #     username: careconlocal
 '''
@@ -153,7 +153,7 @@ RETURN = '''
 # from functools import cmp_to_key
 
 # noinspection PyUnresolvedReferences
-from ansible_collections.dettonville.utils.plugins.module_utils.dict_utils import (
+from ansible_collections.dettonville.utils.plugins.module_utils.utils import (
     sort_single_key,
     sort_multi_key
 )

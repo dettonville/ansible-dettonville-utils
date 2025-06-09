@@ -19,7 +19,7 @@ PROJECT_DIR="$( git rev-parse --show-toplevel )"
 ## only needed if sourcing local private collections by source instead of galaxy
 ## NEEDED when there is are updates/changes to the dependent collections
 ## to be deployed along with the project repo update(s)
-BASE_DIR=$(dirname "${PROJECT_DIR}")
+BASE_DIR="${PROJECT_DIR}/.."
 
 VAULTPASS_FILEPATH="~/.vault_pass"
 if [[ -f "${PROJECT_DIR}/.vault_pass" ]]; then
@@ -31,21 +31,11 @@ VAULT_FILEPATH="./../integration_config.vault.yml"
 SCRIPT_DIR="$( cd "$( dirname "$0" )" && pwd )"
 SCRIPT_FILE=$(basename $0)
 PLAYBOOK="${SCRIPT_FILE%.*}.yml"
-COLLECTION_DIR="${BASE_DIR}/requirements_collections/ansible_collections/${COLLECTION_NAMESPACE}"
 
 echo "SCRIPT_DIR=[${SCRIPT_DIR}]"
 echo "SCRIPT_FILE=[${SCRIPT_FILE}]"
 echo "PLAYBOOK=[${PLAYBOOK}]"
 echo "PROJECT_DIR=${PROJECT_DIR}"
-
-
-if [[ ! -d "${COLLECTION_DIR}" ]]; then
-  mkdir -p "${COLLECTION_DIR}"
-  pushd .
-  cd "${COLLECTION_DIR}"
-  ln -s "../../../${COLLECTION_SOURCE_DIR}" "${COLLECTION_NAME}"
-  popd
-fi
 
 #export ANSIBLE_ROLES_PATH=./
 #export ANSIBLE_COLLECTIONS_PATH=${PROJECT_DIR}/collections

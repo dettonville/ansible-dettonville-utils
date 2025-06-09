@@ -3,8 +3,8 @@
 test_description: "dict object - single key remove test"
 
 test_expected:
-  changed: no
-  failed: no
+  changed: false
+  failed: false
 
 key_patterns:
   - username
@@ -25,7 +25,7 @@ test_object:
     automatic_management_enabled: true
     domain_type: local
     groups:
-    - Administrators
+      - Administrators
     local_admin_username: administrator
     managed: true
     platform_account_type: platform
@@ -49,7 +49,7 @@ test_object:
     automatic_management_enabled: true
     domain_type: local
     groups:
-    - Administrators
+      - Administrators
     local_admin_username: administrator
     managed: true
     platform_account_type: platform
