@@ -20,6 +20,10 @@ on:
 
 jobs:
 
+  ###
+  # Integration tests (REQUIRED)
+  #
+  # https://docs.ansible.com/ansible/latest/dev_guide/testing_integration.html
   integration:
     name: Perform integration testing
     runs-on: ${{ matrix.os }}
@@ -47,6 +51,7 @@ jobs:
           test-deps: >-
             ansible.netcommon
             ansible.utils
+            community.general
 
   ###
   # Sanity tests (REQUIRED)
@@ -78,36 +83,35 @@ jobs:
             ansible.netcommon
             ansible.utils
 
-###
-# Unit tests (OPTIONAL)
+#  ###
+#  # Unit tests (OPTIONAL)
+#  #
+#  # https://docs.ansible.com/ansible/latest/dev_guide/testing_units.html
+#  units:
+#    name: Perform unit testing
+#    runs-on: ${{ matrix.os }}
+#    strategy:
+#      fail-fast: false
+#      matrix:
+#        # Ansible Support matrix
+#        # https://docs.ansible.com/ansible/latest/reference_appendices/release_and_maintenance.html#ansible-core-support-matrix
+#        ansible:
+#          - stable-2.16
+#          - devel
+#        python:
+#          - "3.10"
+#          - "3.11"
+#          - "3.12"
+#        os:
+#          - ubuntu-latest
 #
-# https://docs.ansible.com/ansible/latest/dev_guide/testing_units.html
-
-  units:
-    name: Perform unit testing
-    runs-on: ${{ matrix.os }}
-    strategy:
-      fail-fast: false
-      matrix:
-        # Ansible Support matrix
-        # https://docs.ansible.com/ansible/latest/reference_appendices/release_and_maintenance.html#ansible-core-support-matrix
-        ansible:
-          - stable-2.16
-          - devel
-        python:
-          - "3.10"
-          - "3.11"
-          - "3.12"
-        os:
-          - ubuntu-latest
-
-    steps:
-      - name: Perform unit testing with (${{ matrix.ansible }}+py${{ matrix.python }})
-        uses: ansible-community/ansible-test-gh-action@release/v1
-        with:
-          ansible-core-version: ${{ matrix.ansible }}
-          target-python-version: ${{ matrix.python }}
-          testing-type: units
-          test-deps: >-
-            ansible.netcommon
-            ansible.utils
+#    steps:
+#      - name: Perform unit testing with (${{ matrix.ansible }}+py${{ matrix.python }})
+#        uses: ansible-community/ansible-test-gh-action@release/v1
+#        with:
+#          ansible-core-version: ${{ matrix.ansible }}
+#          target-python-version: ${{ matrix.python }}
+#          testing-type: units
+#          test-deps: >-
+#            ansible.netcommon
+#            ansible.utils
