@@ -37,12 +37,12 @@ jobs:
       - name: Debug test env
         run: |
           ansible-test env
-        working-directory: ./ansible_collections/dettonville/utils
+#        working-directory: ./
 
       - name: Run sanity tests
         run: |
           ansible-test sanity --docker default -v
-        working-directory: ./ansible_collections/dettonville/utils
+#        working-directory: ./
 
   units:
     name: units | ${{ matrix.ansible.name }} | py${{ matrix.python-version }}
@@ -73,12 +73,12 @@ jobs:
       - name: Debug test env
         run: |
           ansible-test env
-        working-directory: ./ansible_collections/dettonville/utils
+#        working-directory: ./
 
       - name: Run unit tests
         run: |
           ansible-test units --docker default --python ${{ matrix.python-version }} -v
-        working-directory: ./ansible_collections/dettonville/utils
+#        working-directory: ./
 
   integration:
     name: integration | ${{ matrix.ansible.name }} | ${{ matrix.os }}
