@@ -1,5 +1,9 @@
 ---
 
+- name: "init-test-vars | Display ansible_env.USER"
+  ansible.builtin.debug:
+    var: ansible_env.USER
+
 - name: "init-test-vars | Display test_component__git_test_results_enabled"
   ansible.builtin.debug:
     var: test_component__git_test_results_enabled

@@ -19,7 +19,7 @@
 
 - name: "{{ __test_component__log_init_job_vars }} Set __test_component__job_path_cli"
   ansible.builtin.set_fact:
-    __test_component__job_path_cli: "{{ lookup('env', 'USER') }}:{{ lookup('env', 'PWD') }}"
+    __test_component__job_path_cli: "{{ lookup('env', 'USER') | d('ci-runner') }}:{{ lookup('env', 'PWD') }}"
 #    __test_component__job_path_cli: "{{ ansible_env.USER|d(ansible_env.USERNAME) }}@{{ ansible_hostname }}:{{ ansible_env.PWD }}"
 
 - name: "{{ __test_component__log_init_job_vars }} Display job info"

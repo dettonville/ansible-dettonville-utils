@@ -1,7 +1,8 @@
 ---
 host_key_checking: no
 
-ansible_python_interpreter: /usr/bin/env python3
+#ansible_python_interpreter: /usr/bin/env python3
+ansible_python_interpreter_default: python3
 #ansible_python_interpreter: "/usr/bin/python3"
 #ansible_python_interpreter: "python3"
 #ansible_python_interpreter: /usr/bin/python3.8
