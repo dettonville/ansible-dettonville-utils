@@ -1,8 +1,0 @@
----
-
-## Test 04 | Remove Hosts
-test_host_state: absent
-test_host_list:
-  - hostname: admin-q1-internal-s1.example.int
-  - hostname: web-q1-internal-s1.example.int
-  - hostname: web-q2-internal-s1.example.int

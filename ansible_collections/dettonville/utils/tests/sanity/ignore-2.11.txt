@@ -1,7 +1,0 @@
-plugins/modules/git_checkout.py use-argspec-type-path # fix needed
-plugins/modules/git_checkout.py validate-modules:doc-missing-type
-plugins/modules/git_checkout.py validate-modules:doc-required-mismatch
-plugins/modules/git_checkout.py validate-modules:invalid-documentation
-plugins/modules/git_checkout.py validate-modules:option-invalid-version-added
-plugins/modules/git_checkout.py validate-modules:parameter-list-no-elements
-plugins/modules/git_checkout.py validate-modules:parameter-type-not-in-doc
