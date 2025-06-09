@@ -24,10 +24,10 @@ jobs:
       - name: Check out code
         uses: actions/checkout@v3
 
-      - name: Set up Python 3.10
-        uses: actions/setup-python@v2
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v5
         with:
-          python-version: "3.10"
+          python-version: "3.12"
 
       - name: Install ansible ${{ matrix.ansible.name }}
         run: |
@@ -53,17 +53,17 @@ jobs:
           - name: devel
             package: https://github.com/ansible/ansible/archive/devel.tar.gz
         python-version:
-          - 3.8
-          - 3.9
           - 3.10
+          - 3.11
+          - 3.12
     steps:
       - name: Check out code
         uses: actions/checkout@v3
 
-      - name: Set up Python 3.10
-        uses: actions/setup-python@v2
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v5
         with:
-          python-version: "3.10"
+          python-version: "3.12"
 
       - name: Install ansible ${{ matrix.ansible.name }}
         run: |
@@ -106,10 +106,10 @@ jobs:
       - name: Check out code
         uses: actions/checkout@v3
 
-      - name: Set up Python 3.10
-        uses: actions/setup-python@v2
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v5
         with:
-          python-version: "3.10"
+          python-version: "3.12"
 
       - name: Install ansible ${{ matrix.ansible.name }}
         run: |
