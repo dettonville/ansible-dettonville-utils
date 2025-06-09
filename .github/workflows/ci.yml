@@ -119,9 +119,9 @@ jobs:
       - name: Debug test env
         run: |
           ansible-test env
-        working-directory: ./ansible_collections/dettonville/utils
+#        working-directory: ./
 
       - name: Run integration tests
         run: |
           ansible-test integration -v --docker ${{ matrix.os.name }} --python ${{ matrix.os.python-version }}
-        working-directory: ./ansible_collections/dettonville/utils
+#        working-directory: ./
