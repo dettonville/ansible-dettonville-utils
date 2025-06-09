@@ -20,7 +20,7 @@ on:
 
 jobs:
 
-  sanity:
+  integration:
     name: Perform integration testing
     runs-on: ${{ matrix.os }}
     strategy:
